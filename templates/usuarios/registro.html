@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Registro | Delivery NATIVO{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4 mb-5">
+    <div class="col-md-6 col-sm-10">
+        <div class="card shadow-sm border-0 rounded-3">
+            <div class="card-body p-5">
+                <div class="text-center mb-4">
+                    <h3 class="fw-bold">Crea tu cuenta</h3>
+                    <p class="text-muted">Únete a la mejor plataforma de delivery local</p>
+                </div>
+                
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Nombre de Usuario</label>
+                        <input type="text" name="username" class="form-control" placeholder="Ej: diego_dev" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Correo Electrónico</label>
+                        <input type="email" name="email" class="form-control" placeholder="correo@ejemplo.com" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Contraseña</label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">¿Cómo deseas usar la plataforma?</label>
+                        <select name="rol" class="form-select border-danger" required>
+                            <option value="" disabled selected>Selecciona una opción...</option>
+                            <option value="cliente">🍔 Quiero pedir comida (Cliente)</option>
+                            <option value="negocio">🏪 Tengo un restaurante (Negocio)</option>
+                            <option value="repartidor">🛵 Quiero hacer entregas (Repartidor)</option>
+                        </select>
+                        <div class="form-text">Esto definirá tu panel de control y opciones.</div>
+                    </div>
+                    
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-warning btn-lg fw-bold text-dark">Registrarme</button>
+                    </div>
+                </form>
+
+                <div class="text-center mt-4">
+                    <p class="mb-0">¿Ya tienes una cuenta? <a href="#" class="text-danger fw-bold text-decoration-none">Inicia sesión</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
