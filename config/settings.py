@@ -142,18 +142,27 @@ AUTH_USER_MODEL = 'usuarios.Usuario'
 # CONFIGURACIÓN DE DJANGO REST FRAMEWORK
 # ==========================================
 REST_FRAMEWORK = {
-    # Paginación global (exigida en la rúbrica)
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
     
-    # Autenticación global por defecto (Sesiones y Tokens básicos)
+    # 1. Agregamos JWT como método de autenticación principal de la API
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication', 
         'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
     ],
     
-    # Por defecto, solo usuarios autenticados pueden usar la API
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ]
+}
+
+# ==========================================
+# CONFIGURACIÓN DE LOS TOKENS JWT
+# ==========================================
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60), # El token dura 1 hora
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),    # Puede pedir uno nuevo hasta por 1 día
+    'AUTH_HEADER_TYPES': ('Bearer',),               # Tus compañeros enviarán "Bearer <token>"
 }
