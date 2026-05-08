@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Inicio | Delivery NATIVO{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center text-center mt-5">
+    <div class="col-md-8">
+        <i class="fas fa-motorcycle fa-4x text-danger mb-3"></i>
+        <h1 class="display-4 fw-bold">Bienvenido a Delivery NATIVO</h1>
+        <p class="lead text-muted mb-5">La plataforma más rápida para conectar tus antojos con los mejores negocios locales.</p>
+
+        {% if user.is_authenticated %}
+            <div class="alert alert-success shadow-sm rounded-3 p-4">
+                <h4 class="alert-heading fw-bold">¡Hola, {{ user.username }}!</h4>
+                <p class="mb-0">Has iniciado sesión con el perfil de <strong>{{ user.get_rol_display }}</strong>.</p>
+                <hr>
+                
+                {% if user.rol == 'cliente' %}
+                    <p class="mb-3">¿Qué se te antoja hoy?</p>
+                    <a href="#" class="btn btn-danger btn-lg"><i class="fas fa-hamburger me-2"></i>Ver Catálogo</a>
+                
+                {% elif user.rol == 'negocio' %}
+                    <p class="mb-3">Es hora de vender.</p>
+                    <a href="#" class="btn btn-warning btn-lg text-dark fw-bold"><i class="fas fa-store me-2"></i>Ver Pedidos Entrantes</a>
+                
+                {% elif user.rol == 'repartidor' %}
+                    <p class="mb-3">¡A encender los motores!</p>
+                    <a href="#" class="btn btn-dark btn-lg"><i class="fas fa-map-marked-alt me-2"></i>Buscar Entregas</a>
+                
+                {% elif user.rol == 'admin' or user.is_superuser %}
+                    <p class="mb-3">Panel de control del sistema.</p>
+                    <a href="#" class="btn btn-primary btn-lg"><i class="fas fa-chart-line me-2"></i>Ver Dashboard</a>
+                {% endif %}
+            </div>
+        {% else %}
+            <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
+                <a href="{% url 'registro' %}" class="btn btn-warning btn-lg px-4 gap-3 fw-bold text-dark">Crear mi cuenta</a>
+                <a href="{% url 'login' %}" class="btn btn-outline-danger btn-lg px-4 fw-bold">Iniciar Sesión</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

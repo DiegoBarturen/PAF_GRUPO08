@@ -18,7 +18,7 @@ def login_view(request):
             
             # Temporalmente lo enviamos al panel admin. 
             # Luego tus compañeros cambiarán esto según el rol (ej. redirect al catálogo o dashboard)
-            return redirect('admin:index') 
+            return redirect('home')
         else:
             messages.error(request, 'Usuario o contraseña incorrectos.')
             
@@ -49,3 +49,6 @@ def registro_view(request):
         return redirect('login')
         
     return render(request, 'usuarios/registro.html')
+
+def home_view(request):
+    return render(request, 'home.html')
