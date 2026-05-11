@@ -3,15 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Delivery Local{% endblock %}</title>
+    <title>{% block title %}Delivery NATIVO{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .navbar-brand { font-size: 1.5rem; }
+        .btn-warning:hover { background-color: #ffca2c; }
+    </style>
 </head>
 <body class="bg-light">
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-danger shadow-sm">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="#"><i class="fas fa-motorcycle me-2"></i>Delivery NATIVO</a>
+            <a class="navbar-brand fw-bold" href="{% url 'home' %}">
+                <i class="fas fa-motorcycle me-2"></i>Delivery NATIVO
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -36,7 +42,6 @@
 
                         {% if user.rol == 'repartidor' %}
                         <li class="nav-item"><a class="nav-link" href="#">Mi Ruta Activa</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#">Historial de Entregas</a></li>
                         {% endif %}
 
                         {% if user.rol == 'admin' or user.is_superuser %}
@@ -49,21 +54,34 @@
                 <ul class="navbar-nav">
                     {% if user.is_authenticated %}
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                            <a class="nav-link dropdown-toggle active" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
                                 <i class="fas fa-user-circle me-1"></i> Hola, {{ user.username }}
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="#">Mi Perfil</a></li>
+                                <li><a class="dropdown-item" href="{% url 'perfil' %}"><i class="fas fa-id-card me-2"></i>Mi Perfil</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><form action="{% url 'logout' %}" method="post" class="d-inline">
-                                {% csrf_token %}
-                                <button type="submit" class="dropdown-item text-danger">Cerrar Sesión</button>
-                                </form></li>
+                                <li>
+                                    <form action="{% url 'logout' %}" method="post" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item text-danger">
+                                            <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
+                                        </button>
+                                    </form>
+                                </li>
                             </ul>
                         </li>
                     {% else %}
-                        <li class="nav-item"><a class="nav-link" href="#">Iniciar Sesión</a></li>
-                        <li class="nav-item"><a class="btn btn-warning ms-2 fw-bold" href="#">Registrarse</a></li>
+                        {% url 'login' as login_url %}
+                        {% url 'registro' as registro_url %}
+
+                        {% if request.path != login_url and request.path != registro_url %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ login_url }}">Iniciar Sesión</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="btn btn-warning ms-2 fw-bold text-dark" href="{{ registro_url }}">Registrarse</a>
+                            </li>
+                        {% endif %}
                     {% endif %}
                 </ul>
             </div>
@@ -73,9 +91,9 @@
     <div class="container mt-3">
         {% if messages %}
             {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert">
                     {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             {% endfor %}
         {% endif %}

@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from .models import Usuario
+from django.contrib.auth.decorators import login_required
 
 def login_view(request):
     # Si el usuario hace clic en "Iniciar Sesión" (envía el formulario)
@@ -52,3 +53,16 @@ def registro_view(request):
 
 def home_view(request):
     return render(request, 'home.html')
+
+@login_required
+def perfil_view(request):
+    if request.method == 'POST':
+        # Capturamos los datos del formulario [cite: 34, 953]
+        request.user.email = request.POST.get('email')
+        request.user.telefono = request.POST.get('telefono')
+        request.user.direccion = request.POST.get('direccion')
+        request.user.save()
+        messages.success(request, '¡Perfil actualizado correctamente!')
+        return redirect('perfil')
+        
+    return render(request, 'usuarios/perfil.html')

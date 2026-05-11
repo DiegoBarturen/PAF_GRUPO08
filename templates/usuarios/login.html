@@ -23,12 +23,16 @@
                         </div>
                     </div>
                     
-                    <div class="mb-4">
+                    <div class="mb-3">
                         <label class="form-label fw-semibold">Contraseña</label>
                         <div class="input-group">
                             <span class="input-group-text bg-light"><i class="fas fa-lock"></i></span>
                             <input type="password" name="password" class="form-control" placeholder="••••••••" required>
                         </div>
+                    </div>
+
+                    <div class="text-end mb-4">
+                        <a href="{% url 'reset_password' %}" class="text-decoration-none small text-danger fw-bold">¿Olvidaste tu contraseña?</a>
                     </div>
                     
                     <div class="d-grid">
@@ -37,7 +41,7 @@
                 </form>
                 
                 <div class="text-center mt-4">
-                    <p class="mb-0">¿No tienes cuenta? <a href="#" class="text-danger fw-bold text-decoration-none">Regístrate aquí</a></p>
+                    <p class="mb-0">¿No tienes cuenta? <a href="{% url 'registro' %}" class="text-danger fw-bold text-decoration-none">Regístrate aquí</a></p>
                 </div>
             </div>
         </div>

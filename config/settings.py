@@ -117,7 +117,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es-pe'
 
 TIME_ZONE = 'UTC'
 
@@ -166,3 +166,6 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),    # Puede pedir uno nuevo hasta por 1 día
     'AUTH_HEADER_TYPES': ('Bearer',),               # Tus compañeros enviarán "Bearer <token>"
 }
+
+# Para ver los correos de recuperación en la terminal de Docker 
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
