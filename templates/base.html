@@ -45,7 +45,7 @@
                         {% endif %}
 
                         {% if user.rol == 'admin' or user.is_superuser %}
-                        <li class="nav-item"><a class="nav-link" href="#">Dashboard Global</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'dashboard_inicio' %}">Dashboard Global</a>
                         {% endif %}
 
                     {% endif %}
