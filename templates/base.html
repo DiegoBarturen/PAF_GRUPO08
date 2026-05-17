@@ -24,9 +24,9 @@
             
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Catálogo</a>
-                    </li>
+              <li class="nav-item">
+                    <a href="{% url 'home_negocios' %}" class="nav-link text-white">Catálogo</a>
+                         </li>
 
                     {% if user.is_authenticated %}
                         
@@ -45,7 +45,7 @@
                         {% endif %}
 
                         {% if user.rol == 'admin' or user.is_superuser %}
-                        <li class="nav-item"><a class="nav-link" href="#">Dashboard Global</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'dashboard_inicio' %}">Dashboard Global</a>
                         {% endif %}
 
                     {% endif %}
