@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="card shadow-sm border-0 p-4 mb-4 bg-white">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <a href="{% url 'home_negocios' %}" class="btn btn-sm btn-outline-secondary mb-3"><i class="bi bi-arrow-left"></i> Volver a Negocios</a>
+                <h2 class="fw-bold text-dark m-0">{{ negocio.nombre }}</h2>
+                <p class="text-muted m-0"><i class="bi bi-geo-alt"></i> {{ negocio.direccion }} | Categoría: {{ negocio.categoria }}</p>
+            </div>
+            <span class="badge bg-success p-2 fs-6">Abierto</span>
+        </div>
+    </div>
+
+    <h3 class="fw-bold text-dark mb-4">Productos Disponibles</h3>
+
+    <div class="row g-4">
+        {% for producto in productos %}
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-0 bg-white">
+                {% if producto.imagen %}
+                    <img src="{{ producto.imagen.url }}" class="card-img-top p-3" alt="{{ producto.nombre }}" style="height: 200px; object-fit: contain;">
+                {% endif %}
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title fw-bold text-dark mb-1">{{ producto.nombre }}</h5>
+                    <p class="card-text text-muted flex-grow-1 small">{{ producto.descripcion }}</p>
+                    
+                    <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+                        <span class="fs-4 fw-bold text-success">S/ {{ producto.precio }}</span>
+                        <small class="text-muted">Stock: {{ producto.stock }} und.</small>
+                    </div>
+                </div>
+                <div class="card-footer bg-white border-0 p-3">
+                    <button class="btn btn-primary w-100 fw-bold">Agregar al carrito</button>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center text-muted py-5">
+            <p class="fs-5">Este establecimiento no tiene productos registrados o disponibles en este momento.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
