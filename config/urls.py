@@ -17,6 +17,7 @@ urlpatterns = [
     path('dashboard/', include('dashboard.urls')),
     path('', include('catalogo.urls')),
     path('api/catalogo/', include('catalogo.urls')),
+    path('pedidos/', include('pedidos.urls')),
 ]
 
 

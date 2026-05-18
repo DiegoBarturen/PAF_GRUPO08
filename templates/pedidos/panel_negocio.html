@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}Panel de Control | Delivery NATIVO{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4 fw-bold text-dark"><i class="fas fa-store me-2 text-danger"></i>Panel de Control: Gestión de Órdenes</h2>
+
+    <div class="row">
+        {% for pedido in pedidos %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 shadow-sm border-2 {% if pedido.estado == 'RE' %}border-warning{% else %}border-light{% endif %} rounded-3 overflow-hidden">
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
+                    <span><i class="fas fa-receipt me-2 text-warning"></i><strong>Orden #{{ pedido.id }}</strong></span>
+                    <small class="badge bg-secondary">{{ pedido.fecha_creacion|date:"H:i" }}</small>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2"><strong><i class="fas fa-user me-1 text-muted"></i> Cliente:</strong> {{ pedido.cliente.get_full_name|default:pedido.cliente.username }}</p>
+                    <p class="mb-1 text-muted small"><strong><i class="fas fa-map-marker-alt me-1"></i> Dir:</strong> {{ pedido.direccion_entrega }}</p>
+                    <hr class="my-3">
+                    
+                    <h6 class="fw-bold text-secondary">Detalle de Productos:</h6>
+                    <ul class="list-unstyled mb-3">
+                        {% for item in pedido.items_pedido.all %}
+                        <li class="d-flex justify-content-between text-dark py-1 border-bottom border-light">
+                            <span>• {{ item.producto.nombre }} <strong class="text-danger">(x{{ item.cantidad }})</strong></span>
+                            <span class="text-muted">S/. {{ item.precio_unitario }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    <div class="text-end fw-bold fs-5 text-danger">
+                        Total: S/. {{ pedido.total|floatformat:2 }}
+                    </div>
+                </div>
+                
+                <div class="card-footer bg-light p-3">
+                    <form action="{% url 'pedidos:cambiar_estado' pedido.id %}" method="POST" class="row g-2 align-items-center">
+                        {% csrf_token %}
+                        <div class="col-7">
+                            <select name="estado" class="form-select form-select-sm border-secondary">
+                                <option value="RE" {% if pedido.estado == 'RE' %}selected{% endif %}>Recibido</option>
+                                <option value="CO" {% if pedido.estado == 'CO' %}selected{% endif %}>Confirmado</option>
+                                <option value="PR" {% if pedido.estado == 'PR' %}selected{% endif %}>En preparación</option>
+                                <option value="LI" {% if pedido.estado == 'LI' %}selected{% endif %}>Listo para recojo</option>
+                                <option value="CA" {% if pedido.estado == 'CA' %}selected{% endif %}>En camino</option>
+                                <option value="EN" {% if pedido.estado == 'EN' %}selected{% endif %}>Entregado</option>
+                                <option value="CN" {% if pedido.estado == 'CN' %}selected{% endif %}>Cancelar</option>
+                            </select>
+                        </div>
+                        <div class="col-5">
+                            <button type="submit" class="btn btn-sm btn-success w-100 fw-bold"><i class="fas fa-sync-alt me-1"></i>Mudar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info text-center shadow-sm py-5 rounded-3">
+                <i class="fas fa-clipboard-list fa-3x mb-3 text-info"></i>
+                <h5 class="fw-bold">Bandeja despejada</h5>
+                <p class="mb-0 text-muted">No hay pedidos pendientes registrados para tu comercio en este momento.</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

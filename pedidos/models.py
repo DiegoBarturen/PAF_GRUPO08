@@ -91,10 +91,8 @@ class Pedido(models.Model):
 
         # 1. VALIDAR HORARIO DEL NEGOCIO
         if self.negocio:
-            if hasattr(self.negocio, "hora_apertura") and hasattr(self.negocio, "hora_cierre"):
-                hora_actual = timezone.localtime().time()
-                if not (self.negocio.hora_apertura <= hora_actual <= self.negocio.hora_cierre):
-                    errors["negocio"] = _("El negocio actualmente se encuentra fuera de horario.")
+            if hasattr(self.negocio, "abierto") and not self.negocio.abierto:
+                errors["negocio"] = _("El negocio actualmente se encuentra cerrado.")
 
         # 2. VALIDACIÓN DE CONSISTENCIA DE ESTADO (Rescatado del código 2)
         if self.estado == EstadoPedido.EN_CAMINO and not self.repartidor:
@@ -144,6 +142,8 @@ class ItemPedido(models.Model):
     precio_unitario = models.DecimalField(
         max_digits=10,
         decimal_places=2,
+        null=True,       # Permite que pase la validación inicial del formulario vacía
+        blank=True,      # Permite que se renderice vacío en formularios si fuera necesario
         verbose_name=_("Precio unitario (Histórico)")
     )
     subtotal = models.DecimalField(
