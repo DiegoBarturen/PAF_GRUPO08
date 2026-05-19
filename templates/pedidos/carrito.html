@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Mi Carrito | Delivery NATIVO{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="d-flex align-items-center mb-4">
+            <i class="fas fa-shopping-cart fa-2x text-danger me-3"></i>
+            <h1 class="h2 mb-0 fw-bold">Mi Carrito de Compras</h1>
+        </div>
+
+        {% if items_carrito %}
+            <div class="card shadow-sm border-0 rounded-3 mb-4">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col" class="ps-4">Producto</th>
+                                <th scope="col">Precio Unitario</th>
+                                <th scope="col">Cantidad</th>
+                                <th scope="col">Subtotal</th>
+                                <th scope="col" class="text-center pe-4">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items_carrito %}
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="fw-bold text-dark">{{ item.producto.nombre }}</div>
+                                    <small class="text-muted">Categoría: {{ item.producto.categoria }}</small>
+                                </td>
+                                <td>S/. {{ item.producto.precio }}</td>
+                                <td class="fw-semibold">{{ item.cantidad }}</td>
+                                <td class="text-danger fw-bold">S/. {{ item.subtotal }}</td>
+                                <td class="text-center pe-4">
+                                    <a href="{% url 'pedidos:eliminar_del_carrito' item.producto.id %}" 
+                                       class="btn btn-outline-danger btn-sm rounded-2" 
+                                       onclick="return confirm('¿Seguro que deseas quitar este producto?');">
+                                        <i class="fas fa-trash-alt me-1"></i> Quitar
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end mb-4">
+                <div class="card shadow-sm border-0 rounded-3 bg-white p-3 px-4 text-end">
+                    <span class="text-muted small fw-bold text-uppercase">Total General</span>
+                    <span class="display-6 fw-bold text-danger">S/. {{ total_carrito }}</span>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0 rounded-3 p-4 bg-white">
+                <h3 class="h4 fw-bold mb-3 text-dark">
+                    <i class="fas fa-map-marker-alt text-warning me-2"></i>Datos de Entrega y Confirmación
+                </h3>
+                
+                <form action="{% url 'pedidos:procesar_carrito' %}" method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        {{ form.as_p }}
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center border-top pt-3">
+                        <a href="{% url 'home_negocios' %}" class="btn btn-outline-secondary rounded-2">
+                            <i class="fas fa-arrow-left me-2"></i>Seguir Comprando
+                        </a>
+                        <button type="submit" class="btn btn-success btn-lg px-4 rounded-3 fw-bold shadow-sm">
+                            <i class="fas fa-lock me-2"></i>Confirmar y Pagar Pedido
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+        {% else %}
+            <div class="card shadow-sm border-0 rounded-3 text-center p-5 bg-white">
+                <div class="mb-3">
+                    <i class="fas fa-shopping-basket fa-4x text-muted opacity-50"></i>
+                </div>
+                <p class="fs-5 text-muted mb-4">Tu carrito está actualmente vacío.</p>
+                <div>
+                    <a href="{% url 'home_negocios' %}" class="btn btn-danger btn-lg px-4 rounded-3 shadow-sm fw-bold">
+                        Ir al Catálogo de Productos
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

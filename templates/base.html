@@ -32,8 +32,7 @@
                         
                         {% if user.rol == 'cliente' %}
                         <li class="nav-item"><a class="nav-link text-white" href="{% url 'pedidos:historial_cliente' %}">Mis Pedidos</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-shopping-cart"></i> Carrito</a></li>
-                        {% endif %}
+<li class="nav-item"><a class="nav-link text-white" href="{% url 'pedidos:ver_carrito' %}"><i class="fas fa-shopping-cart me-1"></i> Carrito</a></li>                        {% endif %}
 
                         {% if user.rol == 'negocio' %}
                         <li class="nav-item"><a class="nav-link text-white" href="{% url 'pedidos:panel_negocio' %}">Pedidos Entrantes</a></li>
