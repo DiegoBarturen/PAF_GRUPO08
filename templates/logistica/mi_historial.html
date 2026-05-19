@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block title %}Mi Historial | Delivery NATIVO{% endblock %}
+
+{% block content %}
+<style>
+    .history-hero {
+        background: linear-gradient(135deg, #fff7f2 0%, #ffffff 52%, #ffe9e0 100%);
+        border: 1px solid rgba(220, 53, 69, 0.08);
+        border-radius: 26px;
+        box-shadow: 0 18px 42px rgba(31, 41, 55, 0.07);
+    }
+
+    .history-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.6rem 1rem;
+        border-radius: 999px;
+        background: #1f2937;
+        color: #fff;
+        font-weight: 700;
+    }
+
+    .history-table-card,
+    .history-event-card,
+    .history-empty-card {
+        border: 0;
+        border-radius: 24px;
+        box-shadow: 0 14px 34px rgba(31, 41, 55, 0.07);
+    }
+
+    .history-event-card {
+        background: linear-gradient(180deg, #ffffff 0%, #fff8f5 100%);
+    }
+
+    .history-label {
+        font-size: 0.76rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #8b6b65;
+        margin-bottom: 0.35rem;
+    }
+
+    @media (min-width: 992px) {
+        .history-mobile-grid {
+            display: none;
+        }
+    }
+
+    @media (max-width: 991.98px) {
+        .history-desktop-table {
+            display: none;
+        }
+    }
+</style>
+
+<div class="row justify-content-center">
+    <div class="col-xl-10">
+        <div class="history-hero p-4 p-lg-5 mb-4">
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-4">
+                <div>
+                    <p class="text-danger fw-semibold mb-2 text-uppercase small">Bitácora de ruta</p>
+                    <h1 class="display-6 fw-bold mb-2">Historial de Entregas</h1>
+                    <p class="text-muted mb-0">Consulta tus eventos logísticos, entregas realizadas y movimientos recientes.</p>
+                </div>
+                {% if perfil_repartidor %}
+                <span class="history-pill"><i class="fas fa-clock-rotate-left"></i>{{ perfil_repartidor.get_estado_actual_display }}</span>
+                {% endif %}
+            </div>
+        </div>
+
+        {% include 'logistica/_nav_repartidor.html' %}
+
+        {% if acceso_denegado %}
+        <div class="card history-empty-card">
+            <div class="card-body p-5 text-center">
+                <h2 class="h4 fw-bold">Acceso solo para repartidores</h2>
+            </div>
+        </div>
+        {% elif historial %}
+        <div class="card history-table-card history-desktop-table">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Pedido</th>
+                            <th>Cliente</th>
+                            <th>Negocio</th>
+                            <th>Evento</th>
+                            <th>Observación</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in historial %}
+                        <tr>
+                            <td>{{ item.fecha|date:"d/m/Y H:i" }}</td>
+                            <td>#{{ item.pedido.id }}</td>
+                            <td>{{ item.pedido.cliente.username }}</td>
+                            <td>{{ item.pedido.negocio.nombre_comercial }}</td>
+                            <td><span class="badge text-bg-secondary">{{ item.get_evento_display }}</span></td>
+                            <td>{{ item.observacion|default:"Sin observación" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="history-mobile-grid">
+            <div class="row g-3">
+                {% for item in historial %}
+                <div class="col-12">
+                    <div class="card history-event-card">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                                <div>
+                                    <div class="history-label">Pedido</div>
+                                    <h2 class="h5 fw-bold mb-0">#{{ item.pedido.id }}</h2>
+                                </div>
+                                <span class="badge text-bg-secondary">{{ item.get_evento_display }}</span>
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-sm-6">
+                                    <div class="history-label">Fecha</div>
+                                    <div>{{ item.fecha|date:"d/m/Y H:i" }}</div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="history-label">Cliente</div>
+                                    <div>{{ item.pedido.cliente.username }}</div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="history-label">Negocio</div>
+                                    <div>{{ item.pedido.negocio.nombre_comercial }}</div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="history-label">Observación</div>
+                                    <div>{{ item.observacion|default:"Sin observación" }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div class="card history-empty-card">
+            <div class="card-body p-5 text-center">
+                <i class="fas fa-receipt fa-3x text-danger mb-3"></i>
+                <h2 class="h3 fw-bold">Aún no tienes historial registrado</h2>
+                <p class="text-muted mb-0">Tus eventos de asignación, recojo y entrega aparecerán aquí.</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

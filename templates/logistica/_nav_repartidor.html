@@ -1,0 +1,63 @@
+<style>
+    .driver-nav {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.85rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .driver-nav-link {
+        border: 1px solid rgba(220, 53, 69, 0.18);
+        background: linear-gradient(180deg, #ffffff 0%, #fff7f4 100%);
+        color: #c73645;
+        border-radius: 18px;
+        padding: 0.95rem 1rem;
+        text-decoration: none;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.55rem;
+        box-shadow: 0 10px 24px rgba(31, 41, 55, 0.05);
+        transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+
+    .driver-nav-link:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 14px 28px rgba(31, 41, 55, 0.08);
+        border-color: rgba(220, 53, 69, 0.35);
+        color: #b42332;
+    }
+
+    .driver-nav-link.active {
+        background: linear-gradient(135deg, #dc3545 0%, #ff7b54 100%);
+        color: #fff;
+        border-color: transparent;
+        box-shadow: 0 16px 36px rgba(220, 53, 69, 0.28);
+    }
+
+    @media (max-width: 767.98px) {
+        .driver-nav {
+            grid-template-columns: 1fr;
+        }
+
+        .driver-nav-link {
+            justify-content: flex-start;
+        }
+    }
+</style>
+
+<div class="driver-nav">
+    <a href="{% url 'logistica:mi_pedido_activo' %}" class="driver-nav-link {% if request.resolver_match.url_name == 'mi_pedido_activo' %}active{% endif %}">
+        <i class="fas fa-motorcycle"></i>
+        <span>Pedido Activo</span>
+    </a>
+    <a href="{% url 'logistica:mi_historial' %}" class="driver-nav-link {% if request.resolver_match.url_name == 'mi_historial' %}active{% endif %}">
+        <i class="fas fa-clock-rotate-left"></i>
+        <span>Mi Historial</span>
+    </a>
+    <a href="{% url 'logistica:mi_perfil' %}" class="driver-nav-link {% if request.resolver_match.url_name == 'mi_perfil' %}active{% endif %}">
+        <i class="fas fa-id-card"></i>
+        <span>Mi Perfil</span>
+    </a>
+</div>

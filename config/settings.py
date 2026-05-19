@@ -37,16 +37,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
-    # --- Librerías de terceros ---
-    'rest_framework',
-    
-    # --- Aplicaciones del PAF ---
+    'rest_framework',  
     'usuarios',
     'catalogo',
     'pedidos',
     'logistica',
     'dashboard',
+    'django_filters',
+    'corsheaders',
+    
 ]
 
 MIDDLEWARE = [
@@ -57,6 +56,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -130,9 +130,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
-
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
+
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -142,18 +144,26 @@ AUTH_USER_MODEL = 'usuarios.Usuario'
 # CONFIGURACIÓN DE DJANGO REST FRAMEWORK
 # ==========================================
 REST_FRAMEWORK = {
+    # 1. Tu paginación original (Intacta)
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
     
-    # 1. Agregamos JWT como método de autenticación principal de la API
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication', 
-        'rest_framework.authentication.SessionAuthentication',
-    ],
+    # 2. La seguridad de los tokens y la sesión
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication', 
+    ),
     
-    'DEFAULT_PERMISSION_CLASSES': [
+    # 3. Los permisos globales
+    'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
-    ]
+    ),
+
+    # 4. Los nuevos motores de filtro y búsqueda
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
+    ),
 }
 
 # ==========================================
@@ -162,10 +172,10 @@ REST_FRAMEWORK = {
 from datetime import timedelta
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60), # El token dura 1 hora
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),    # Puede pedir uno nuevo hasta por 1 día
-    'AUTH_HEADER_TYPES': ('Bearer',),               # Tus compañeros enviarán "Bearer <token>"
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60), 
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),    
+    'AUTH_HEADER_TYPES': ('Bearer',),               
 }
 
-# Para ver los correos de recuperación en la terminal de Docker 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+CORS_ALLOW_ALL_ORIGINS = True
