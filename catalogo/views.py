@@ -9,10 +9,13 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from django.shortcuts import render, redirect, get_object_or_404 # <-- CORREGIDO AQUÍ (404)
 from .forms import NegocioForm, ProductoForm
 
+<<<<<<< HEAD
 
 
 
 
+=======
+>>>>>>> d37fc40967e944aa5d13f7d041562a1b4dfc63e8
 class CategoriaViewSet(viewsets.ModelViewSet):
     queryset = Categoria.objects.all()
     serializer_class = CategoriaSerializer
@@ -35,6 +38,7 @@ def catalogo_vista(request):
     productos_lista = Producto.objects.filter(disponible=True).select_related('negocio')
     return render(request, 'catalogo/vitrina.html', {'productos': productos_lista})
     
+<<<<<<< HEAD
 # 1. Registrar un negocio nuevo
 def registrar_negocio(request):
     if request.method == 'POST':
@@ -45,6 +49,26 @@ def registrar_negocio(request):
     else:
         form = NegocioForm()
     return render(request, 'catalogo/form_negocio.html', {'form': form})
+=======
+def registrar_negocio(request):
+    negocio = Negocio.objects.filter(propietario=request.user).first()
+    
+    if request.method == 'POST':
+        form = NegocioForm(request.POST, instance=negocio)
+        if form.is_valid():
+            obj = form.save(commit=False)
+            if not negocio:
+                obj.propietario = request.user
+            obj.save()
+            return redirect('pedidos:panel_negocio')
+    else:
+        form = NegocioForm(instance=negocio)
+        
+    return render(request, 'catalogo/form_negocio.html', {
+        'form': form,
+        'existe': negocio is not None
+    })
+>>>>>>> d37fc40967e944aa5d13f7d041562a1b4dfc63e8
 
 # 2. Panel de administración CRUD de productos
 def administrar_productos(request):

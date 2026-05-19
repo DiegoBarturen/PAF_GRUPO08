@@ -17,8 +17,17 @@ urlpatterns = [
     path('dashboard/', include('dashboard.urls')),
     path('', include('catalogo.urls')),
     path('api/catalogo/', include('catalogo.urls')),
+<<<<<<< HEAD
+=======
+    path('pedidos/', include('pedidos.urls')),
+    path('', include(('logistica.urls', 'logistica'), namespace='logistica')),
+>>>>>>> d37fc40967e944aa5d13f7d041562a1b4dfc63e8
 ]
 
 
 if settings.DEBUG:
+<<<<<<< HEAD
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+=======
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+>>>>>>> d37fc40967e944aa5d13f7d041562a1b4dfc63e8

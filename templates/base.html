@@ -21,31 +21,40 @@
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            
+
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
               <li class="nav-item">
                     <a href="{% url 'home_negocios' %}" class="nav-link text-white">Catálogo</a>
                          </li>
+                    
+                    {% if not user.is_authenticated or user.rol == 'cliente' or user.rol == 'admin' %}
+                    <li class="nav-item">
+                        <a href="{% url 'home_negocios' %}" class="nav-link text-white">Catálogo</a>
+                    </li>
+                    {% endif %}
 
                     {% if user.is_authenticated %}
                         
                         {% if user.rol == 'cliente' %}
-                        <li class="nav-item"><a class="nav-link" href="#">Mis Pedidos</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-shopping-cart"></i> Carrito</a></li>
+                        <li class="nav-item"><a class="nav-link text-white" href="{% url 'pedidos:historial_cliente' %}">Mis Pedidos</a></li>
+                        <li class="nav-item"><a class="nav-link text-white" href="#"><i class="fas fa-shopping-cart"></i> Carrito</a></li>
                         {% endif %}
 
-                        {% if user.rol == 'negocio' %}
-                        <li class="nav-item"><a class="nav-link" href="#">Pedidos Entrantes</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#">Mis Productos</a></li>
+                        {% if user.rol == 'negocio' or user.rol == 'admin' %}
+                        <li class="nav-item"><a class="nav-link text-white" href="{% url 'registrar_negocio' %}">Mi Establecimiento</a></li>
+                        <li class="nav-item"><a class="nav-link text-white" href="{% url 'pedidos:panel_negocio' %}">Pedidos Entrantes</a></li>
+                        <li class="nav-item"><a class="nav-link text-white" href="{% url 'administrar_productos' %}">Mis Productos (CRUD)</a></li>
                         {% endif %}
 
                         {% if user.rol == 'repartidor' %}
-                        <li class="nav-item"><a class="nav-link" href="#">Mi Ruta Activa</a></li>
+                        <li class="nav-item"><a class="nav-link text-white" href="{% url 'logistica:mi_pedido_activo' %}">Mi Ruta Activa</a></li>
                         {% endif %}
 
                         {% if user.rol == 'admin' or user.is_superuser %}
                         <li class="nav-item"><a class="nav-link" href="{% url 'dashboard_inicio' %}">Dashboard Global</a>
+                        {% if user.rol == 'admin' %}
+                        <li class="nav-item"><a class="nav-link text-white" href="{% url 'dashboard_inicio' %}">Dashboard Global</a></li>
                         {% endif %}
 
                     {% endif %}

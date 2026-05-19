@@ -11,25 +11,25 @@
 
         {% if user.is_authenticated %}
             <div class="alert alert-success shadow-sm rounded-3 p-4">
-                <h4 class="alert-heading fw-bold">¡Hola, {{ user.username }}!</h4>
+                <h4 class="alert-heading fw-bold">Hola, {{ user.username }}.</h4>
                 <p class="mb-0">Has iniciado sesión con el perfil de <strong>{{ user.get_rol_display }}</strong>.</p>
                 <hr>
-                
+
                 {% if user.rol == 'cliente' %}
                     <p class="mb-3">¿Qué se te antoja hoy?</p>
-                    <a href="#" class="btn btn-danger btn-lg"><i class="fas fa-hamburger me-2"></i>Ver Catálogo</a>
-                
+                    <a href="{% url 'home_negocios' %}" class="btn btn-danger btn-lg"><i class="fas fa-hamburger me-2"></i>Ver Catálogo</a>
+
                 {% elif user.rol == 'negocio' %}
                     <p class="mb-3">Es hora de vender.</p>
-                    <a href="#" class="btn btn-warning btn-lg text-dark fw-bold"><i class="fas fa-store me-2"></i>Ver Pedidos Entrantes</a>
-                
+                    <a href="{% url 'pedidos:panel_negocio' %}" class="btn btn-warning btn-lg text-dark fw-bold"><i class="fas fa-store me-2"></i>Ver Pedidos Entrantes</a>
+
                 {% elif user.rol == 'repartidor' %}
-                    <p class="mb-3">¡A encender los motores!</p>
-                    <a href="#" class="btn btn-dark btn-lg"><i class="fas fa-map-marked-alt me-2"></i>Buscar Entregas</a>
-                
+                    <p class="mb-3">A encender los motores.</p>
+                    <a href="{% url 'logistica:mi_pedido_activo' %}" class="btn btn-dark btn-lg"><i class="fas fa-map-marked-alt me-2"></i>Buscar Entregas</a>
+
                 {% elif user.rol == 'admin' or user.is_superuser %}
                     <p class="mb-3">Panel de control del sistema.</p>
-                    <a href="#" class="btn btn-primary btn-lg"><i class="fas fa-chart-line me-2"></i>Ver Dashboard</a>
+                    <a href="{% url 'dashboard_inicio' %}" class="btn btn-primary btn-lg"><i class="fas fa-chart-line me-2"></i>Ver Dashboard</a>
                 {% endif %}
             </div>
         {% else %}

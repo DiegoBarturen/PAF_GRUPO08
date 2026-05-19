@@ -21,11 +21,13 @@
         </div>
     </div>
 
+    {% if user.is_authenticated and user.rol == 'admin' %}
     <div class="d-flex justify-content-end mb-4">
         <a href="{% url 'registrar_negocio' %}" class="btn btn-sm btn-outline-dark fw-bold">
             <i class="bi bi-shop"></i> + Registrar Nuevo Establecimiento
         </a>
     </div>
+    {% endif %}
 
     <hr class="text-muted mb-4">
 
@@ -65,6 +67,7 @@
         {% empty %}
         <div class="col-12 text-center text-muted py-5">
             <div class="p-5 bg-white shadow-sm rounded-3 style="max-width: 500px; margin: 0 auto;"">
+            <div class="p-5 bg-white shadow-sm rounded-3" style="max-width: 500px; margin: 0 auto;">
                 <i class="bi bi-shop-window text-muted display-4 mb-3 d-block"></i>
                 <h5 class="fw-bold text-dark">No se encontraron establecimientos</h5>
                 <p class="mb-0 small">Prueba modificando los términos del buscador o registra un nuevo local.</p>
