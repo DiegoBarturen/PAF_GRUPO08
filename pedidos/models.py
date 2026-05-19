@@ -15,6 +15,13 @@ class Pedido(models.Model):
     Modelo principal del pedido.
     Representa una orden realizada por un cliente con cálculos automáticos.
     """
+    METODO_PAGO_EFECTIVO = "efectivo"
+    METODO_PAGO_POS = "pos"
+    METODOS_PAGO = (
+        (METODO_PAGO_EFECTIVO, _("Efectivo contra entrega")),
+        (METODO_PAGO_POS, _("Tarjeta con POS contra entrega")),
+    )
+
     cliente = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT,
@@ -62,6 +69,18 @@ class Pedido(models.Model):
     direccion_entrega = models.TextField(
         verbose_name=_("Dirección de entrega")
     )
+    telefono = models.CharField(
+        max_length=15,
+        blank=True,
+        default="",
+        verbose_name=_("Teléfono de contacto")
+    )
+    metodo_pago = models.CharField(
+        max_length=20,
+        choices=METODOS_PAGO,
+        default=METODO_PAGO_EFECTIVO,
+        verbose_name=_("Método de pago")
+    )
     observaciones = models.TextField(
         null=True,
         blank=True,
@@ -90,8 +109,9 @@ class Pedido(models.Model):
         errors = {}
 
         # 1. VALIDAR HORARIO DEL NEGOCIO
-        if self.negocio:
-            if hasattr(self.negocio, "abierto") and not self.negocio.abierto:
+        if self.negocio_id:
+            negocio = self.negocio
+            if hasattr(negocio, "abierto") and not negocio.abierto:
                 errors["negocio"] = _("El negocio actualmente se encuentra cerrado.")
 
         # 2. VALIDACIÓN DE CONSISTENCIA DE ESTADO (Rescatado del código 2)

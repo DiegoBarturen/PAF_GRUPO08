@@ -31,7 +31,13 @@
                     </div>
                 </div>
                 <div class="card-footer bg-white border-0 p-3">
-                    <button class="btn btn-primary w-100 fw-bold">Agregar al carrito</button>
+                    <form action="{% url 'pedidos:agregar_al_carrito' producto.id %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="cantidad" value="1">
+                        <button type="submit" class="btn btn-primary w-100 fw-bold" {% if producto.stock <= 0 %}disabled{% endif %}>
+                            {% if producto.stock <= 0 %}Sin stock{% else %}Agregar al carrito{% endif %}
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>

@@ -35,16 +35,24 @@ def catalogo_vista(request):
     productos_lista = Producto.objects.filter(disponible=True).select_related('negocio')
     return render(request, 'catalogo/vitrina.html', {'productos': productos_lista})
     
-# 1. Registrar un negocio nuevo
 def registrar_negocio(request):
+    negocio = Negocio.objects.filter(propietario=request.user).first()
+    
     if request.method == 'POST':
-        form = NegocioForm(request.POST)
+        form = NegocioForm(request.POST, instance=negocio)
         if form.is_valid():
-            form.save()
-            return redirect('catalogo_vitrina')
+            obj = form.save(commit=False)
+            if not negocio:
+                obj.propietario = request.user
+            obj.save()
+            return redirect('pedidos:panel_negocio')
     else:
-        form = NegocioForm()
-    return render(request, 'catalogo/form_negocio.html', {'form': form})
+        form = NegocioForm(instance=negocio)
+        
+    return render(request, 'catalogo/form_negocio.html', {
+        'form': form,
+        'existe': negocio is not None
+    })
 
 # 2. Panel de administración CRUD de productos
 def administrar_productos(request):

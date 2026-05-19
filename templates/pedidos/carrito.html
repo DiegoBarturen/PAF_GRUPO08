@@ -12,6 +12,24 @@
 
         {% if items_carrito %}
             <div class="card shadow-sm border-0 rounded-3 mb-4">
+                <div class="card-body border-bottom">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+                        <div>
+                            <h2 class="h5 fw-bold mb-1">Checkout del negocio</h2>
+                            <p class="text-muted mb-0">
+                                {% if negocio_carrito %}
+                                    {{ negocio_carrito.nombre_comercial }} | {{ negocio_carrito.direccion }}
+                                {% else %}
+                                    Revisa los productos agregados antes de confirmar.
+                                {% endif %}
+                            </p>
+                        </div>
+                        <a href="{% url 'home_negocios' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Seguir comprando
+                        </a>
+                    </div>
+                </div>
+
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
                         <thead class="table-light">
@@ -31,11 +49,22 @@
                                     <small class="text-muted">Categoría: {{ item.producto.categoria }}</small>
                                 </td>
                                 <td>S/. {{ item.producto.precio }}</td>
-                                <td class="fw-semibold">{{ item.cantidad }}</td>
+                                <td>
+                                    <form action="{% url 'pedidos:actualizar_cantidad_carrito' item.producto.id %}" method="post" class="d-inline-flex align-items-center gap-2">
+                                        {% csrf_token %}
+                                        <button type="submit" name="cantidad" value="{{ item.cantidad|add:'-1' }}" class="btn btn-outline-secondary btn-sm" aria-label="Restar una unidad">
+                                            -
+                                        </button>
+                                        <span class="fw-semibold text-center" style="min-width: 32px;">{{ item.cantidad }}</span>
+                                        <button type="submit" name="cantidad" value="{{ item.cantidad|add:'1' }}" class="btn btn-outline-secondary btn-sm" aria-label="Sumar una unidad">
+                                            +
+                                        </button>
+                                    </form>
+                                </td>
                                 <td class="text-danger fw-bold">S/. {{ item.subtotal }}</td>
                                 <td class="text-center pe-4">
-                                    <a href="{% url 'pedidos:eliminar_del_carrito' item.producto.id %}" 
-                                       class="btn btn-outline-danger btn-sm rounded-2" 
+                                    <a href="{% url 'pedidos:eliminar_del_carrito' item.producto.id %}"
+                                       class="btn btn-outline-danger btn-sm rounded-2"
                                        onclick="return confirm('¿Seguro que deseas quitar este producto?');">
                                         <i class="fas fa-trash-alt me-1"></i> Quitar
                                     </a>
@@ -54,16 +83,96 @@
                 </div>
             </div>
 
+            {% if productos_sugeridos %}
+            <div class="card shadow-sm border-0 rounded-3 p-4 bg-white mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h3 class="h5 fw-bold text-dark mb-1">¿Se te antoja algo más?</h3>
+                        <p class="text-muted mb-0">Te sugerimos algunos productos del mismo restaurante.</p>
+                    </div>
+                    <span class="badge text-bg-warning">Venta cruzada</span>
+                </div>
+
+                <div class="row g-3">
+                    {% for sugerido in productos_sugeridos %}
+                    <div class="col-md-4">
+                        <div class="card h-100 border-0 bg-light-subtle shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex gap-3 align-items-start">
+                                    {% if sugerido.imagen %}
+                                    <img src="{{ sugerido.imagen.url }}" alt="{{ sugerido.nombre }}" class="rounded" style="width: 72px; height: 72px; object-fit: cover;">
+                                    {% else %}
+                                    <div class="rounded bg-white border d-flex align-items-center justify-content-center text-muted" style="width: 72px; height: 72px;">
+                                        <i class="fas fa-utensils"></i>
+                                    </div>
+                                    {% endif %}
+
+                                    <div class="flex-grow-1">
+                                        <h4 class="h6 fw-bold mb-1">{{ sugerido.nombre }}</h4>
+                                        <p class="text-muted small mb-2">{{ sugerido.categoria }}</p>
+                                        <div class="fw-bold text-success mb-3">S/. {{ sugerido.precio }}</div>
+
+                                        <form action="{% url 'pedidos:agregar_al_carrito' sugerido.id %}" method="post">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="cantidad" value="1">
+                                            <button type="submit" class="btn btn-sm btn-outline-primary w-100">
+                                                Agregar rápido
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
             <div class="card shadow-sm border-0 rounded-3 p-4 bg-white">
                 <h3 class="h4 fw-bold mb-3 text-dark">
                     <i class="fas fa-map-marker-alt text-warning me-2"></i>Datos de Entrega y Confirmación
                 </h3>
-                
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {{ form.non_field_errors|join:", " }}
+                    </div>
+                {% endif %}
+
                 <form action="{% url 'pedidos:procesar_carrito' %}" method="POST">
                     {% csrf_token %}
-                    
+
+                    <div class="mb-3">
+                        <label for="{{ form.telefono.id_for_label }}" class="form-label fw-semibold">Teléfono de contacto</label>
+                        {{ form.telefono }}
+                        {% if form.telefono.errors %}
+                            <div class="text-danger small mt-1">{{ form.telefono.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.metodo_pago.id_for_label }}" class="form-label fw-semibold">Método de pago</label>
+                        {{ form.metodo_pago }}
+                        {% if form.metodo_pago.errors %}
+                            <div class="text-danger small mt-1">{{ form.metodo_pago.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.direccion_entrega.id_for_label }}" class="form-label fw-semibold">Dirección de entrega</label>
+                        {{ form.direccion_entrega }}
+                        {% if form.direccion_entrega.errors %}
+                            <div class="text-danger small mt-1">{{ form.direccion_entrega.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+
                     <div class="mb-4">
-                        {{ form.as_p }}
+                        <label for="{{ form.observaciones.id_for_label }}" class="form-label fw-semibold">Observaciones</label>
+                        {{ form.observaciones }}
+                        {% if form.observaciones.errors %}
+                            <div class="text-danger small mt-1">{{ form.observaciones.errors|join:", " }}</div>
+                        {% endif %}
                     </div>
 
                     <div class="d-flex justify-content-between align-items-center border-top pt-3">

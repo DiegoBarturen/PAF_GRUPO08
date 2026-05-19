@@ -1,51 +1,64 @@
-# pedidos/forms.py
-from django import forms 
-from pedidos.models import Pedido
+from django import forms
+
 from config.choices import EstadoPedido
+from pedidos.models import Pedido
+
 
 class CrearPedidoForm(forms.ModelForm):
     """
-    Formulario para que el cliente inicie la orden de delivery.
-    Incluye los campos que el usuario debe llenar en el frontend,
-    siguiendo los estándares de validación de la Sesión 4.
+    Formulario del checkout web.
+    El negocio se asigna automáticamente desde el carrito en la vista.
     """
+
     class Meta:
         model = Pedido
-        # Agregamos dirección y observaciones, ya que el cliente debe digitarlas en la web
-        fields = ['negocio', 'direccion_entrega', 'observaciones']
+        fields = ["telefono", "metodo_pago", "direccion_entrega", "observaciones"]
         widgets = {
-            'direccion_entrega': forms.Textarea(attrs={
-                'class': 'form-control', 
-                'rows': 3, 
-                'placeholder': 'Ej. Av. Larco 123, Dpto 402'
-            }),
-            'observaciones': forms.Textarea(attrs={
-                'class': 'form-control', 
-                'rows': 2, 
-                'placeholder': 'Ej. Tocar el timbre fuerte, sin mayonesa, etc.'
-            }),
-            'negocio': forms.Select(attrs={'class': 'form-select'}),
+            "telefono": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "999 999 999",
+                }
+            ),
+            "metodo_pago": forms.Select(
+                attrs={
+                    "class": "form-select",
+                }
+            ),
+            "direccion_entrega": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 3,
+                    "placeholder": "Ej. Av. Larco 123, Dpto 402",
+                }
+            ),
+            "observaciones": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 2,
+                    "placeholder": "Ej. Tocar el timbre fuerte, sin mayonesa, etc.",
+                }
+            ),
         }
 
     def __init__(self, *args, **kwargs):
-        """
-        Filtramos el queryset para mostrar únicamente los negocios que están abiertos.
-        """
+        telefono_inicial = kwargs.pop("telefono_inicial", "")
         super().__init__(*args, **kwargs)
-        if 'negocio' in self.fields:
-            self.fields['negocio'].queryset = self.fields['negocio'].queryset.filter(abierto=True)
+        self.fields["telefono"].initial = telefono_inicial
+        self.fields["telefono"].required = False
+        self.fields["metodo_pago"].required = True
 
 
 class ActualizarEstadoPedidoForm(forms.ModelForm):
     """
-    Formulario seguro utilizado por el restaurante (Negocio) desde su panel
-    para avanzar el pedido en la máquina de estados mediante peticiones POST.
+    Formulario seguro utilizado por el restaurante para avanzar el pedido.
     """
+
     estado = forms.ChoiceField(
         choices=EstadoPedido.choices,
-        widget=forms.Select(attrs={'class': 'form-select'})
+        widget=forms.Select(attrs={"class": "form-select"}),
     )
 
     class Meta:
         model = Pedido
-        fields = ['estado']
+        fields = ["estado"]
