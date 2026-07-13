@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Entornos y secretos
+.env
+venv/
+env/
+
+# Base de datos local (por si acaso)
+db.sqlite3
+
+# Archivos estáticos y multimedia
+media/

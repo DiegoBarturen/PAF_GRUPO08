@@ -1,0 +1,280 @@
+{% extends 'base.html' %}
+
+{% block title %}Mi Historial | Delivery NATIVO{% endblock %}
+
+{% block content %}
+<style>
+    .history-hero {
+        background: linear-gradient(135deg, #fff7f2 0%, #ffffff 52%, #ffe9e0 100%);
+        border: 1px solid rgba(220, 53, 69, 0.08);
+        border-radius: 26px;
+        box-shadow: 0 18px 42px rgba(31, 41, 55, 0.07);
+    }
+
+    .history-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.6rem 1rem;
+        border-radius: 999px;
+        background: #1f2937;
+        color: #fff;
+        font-weight: 700;
+    }
+
+    .history-shell,
+    .history-event-card,
+    .history-empty-card {
+        border: 0;
+        border-radius: 24px;
+        box-shadow: 0 14px 34px rgba(31, 41, 55, 0.07);
+    }
+
+    .history-shell {
+        overflow: hidden;
+        background: linear-gradient(180deg, #fffefe 0%, #fff8f5 100%);
+    }
+
+    .history-table thead th {
+        font-size: 0.78rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #8b6b65;
+        border-bottom-width: 1px;
+        padding-top: 1.15rem;
+        padding-bottom: 1rem;
+    }
+
+    .history-table tbody tr {
+        transition: background 0.18s ease;
+    }
+
+    .history-table tbody tr:hover {
+        background: rgba(255, 122, 89, 0.05);
+    }
+
+    .history-table td {
+        vertical-align: middle;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+        border-color: rgba(31, 41, 55, 0.06);
+    }
+
+    .history-date {
+        min-width: 118px;
+        font-weight: 700;
+        color: #1f2937;
+    }
+
+    .history-date small {
+        display: block;
+        color: #8b6b65;
+        font-weight: 600;
+        margin-top: 0.2rem;
+    }
+
+    .pedido-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.48rem 0.8rem;
+        border-radius: 999px;
+        background: #fff1ec;
+        color: #c73645;
+        font-weight: 800;
+        border: 1px solid rgba(220, 53, 69, 0.12);
+    }
+
+    .event-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.48rem 0.8rem;
+        border-radius: 999px;
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+    }
+
+    .event-badge.assigned {
+        background: #fff4e8;
+        color: #b45309;
+        border: 1px solid rgba(180, 83, 9, 0.14);
+    }
+
+    .event-badge.picked {
+        background: #ecfeff;
+        color: #0f766e;
+        border: 1px solid rgba(15, 118, 110, 0.14);
+    }
+
+    .event-badge.delivered {
+        background: #ecfdf3;
+        color: #166534;
+        border: 1px solid rgba(22, 101, 52, 0.14);
+    }
+
+    .history-note {
+        max-width: 280px;
+        color: #514a57;
+        line-height: 1.45;
+    }
+
+    .history-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        text-decoration: none;
+        color: #c73645;
+        font-weight: 700;
+    }
+
+    .history-link:hover {
+        color: #a61f33;
+    }
+
+    .history-event-card {
+        background: linear-gradient(180deg, #ffffff 0%, #fff8f5 100%);
+    }
+
+    .history-mobile-note {
+        border-radius: 18px;
+        background: #fffdfa;
+        border: 1px solid rgba(31, 41, 55, 0.06);
+        padding: 0.9rem 1rem;
+        color: #514a57;
+        line-height: 1.5;
+    }
+
+    .history-label {
+        font-size: 0.76rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #8b6b65;
+        margin-bottom: 0.35rem;
+    }
+
+    @media (min-width: 992px) {
+        .history-mobile-grid {
+            display: none;
+        }
+    }
+
+    @media (max-width: 991.98px) {
+        .history-desktop-table {
+            display: none;
+        }
+    }
+</style>
+
+<div class="row justify-content-center">
+    <div class="col-xl-10">
+        <div class="history-hero p-4 p-lg-5 mb-4">
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-4">
+                <div>
+                    <p class="text-danger fw-semibold mb-2 text-uppercase small">Bitacora de ruta</p>
+                    <h1 class="display-6 fw-bold mb-2">Historial de Entregas</h1>
+                    <p class="text-muted mb-0">Consulta tus eventos logisticos, entregas realizadas y movimientos recientes.</p>
+                </div>
+                {% if perfil_repartidor %}
+                <span class="history-pill"><i class="fas fa-clock-rotate-left"></i>{{ perfil_repartidor.get_estado_actual_display }}</span>
+                {% endif %}
+            </div>
+        </div>
+
+        {% include 'logistica/_nav_repartidor.html' %}
+
+        {% if acceso_denegado %}
+        <div class="card history-empty-card">
+            <div class="card-body p-5 text-center">
+                <h2 class="h4 fw-bold">Acceso solo para repartidores</h2>
+            </div>
+        </div>
+        {% elif historial %}
+        <div class="card history-shell history-desktop-table">
+            <div class="table-responsive">
+                <table class="table history-table align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Fecha</th>
+                            <th>Pedido</th>
+                            <th>Cliente</th>
+                            <th>Sede</th>
+                            <th>Evento</th>
+                            <th>Observacion</th>
+                            <th class="text-end pe-4">Detalle</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in historial %}
+                        <tr>
+                            <td class="ps-4 history-date">
+                                {{ item.fecha|date:"d/m/Y" }}
+                                <small>{{ item.fecha|date:"H:i" }}</small>
+                            </td>
+                            <td><span class="pedido-pill"><i class="fas fa-receipt"></i>#{{ item.pedido.id }}</span></td>
+                            <td class="fw-semibold text-dark">{{ item.pedido.cliente.username }}</td>
+                            <td>{{ item.pedido.sede.nombre_comercial }} - {{ item.pedido.sede.nombre }}</td>
+                            <td><span class="{{ item.badge_class }}">{{ item.get_evento_display }}</span></td>
+                            <td class="history-note">{{ item.observacion_resumida }}</td>
+                            <td class="text-end pe-4">
+                                <a href="{% url 'logistica:detalle_evento_historial' item.id %}" class="history-link">
+                                    Ver detalle <i class="fas fa-arrow-right"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="history-mobile-grid">
+            <div class="row g-3">
+                {% for item in historial %}
+                <div class="col-12">
+                    <div class="card history-event-card">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                                <div>
+                                    <div class="history-label">Pedido</div>
+                                    <h2 class="h5 fw-bold mb-0">#{{ item.pedido.id }}</h2>
+                                </div>
+                                <span class="{{ item.badge_class }}">{{ item.get_evento_display }}</span>
+                            </div>
+                            <div class="row g-3 mb-3">
+                                <div class="col-sm-6">
+                                    <div class="history-label">Fecha</div>
+                                    <div>{{ item.fecha|date:"d/m/Y H:i" }}</div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="history-label">Cliente</div>
+                                    <div>{{ item.pedido.cliente.username }}</div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="history-label">Sede</div>
+                                    <div>{{ item.pedido.sede.nombre_comercial }} - {{ item.pedido.sede.nombre }}</div>
+                                </div>
+                            </div>
+                            <div class="history-mobile-note mb-3">{{ item.observacion_resumida }}</div>
+                            <a href="{% url 'logistica:detalle_evento_historial' item.id %}" class="history-link">
+                                Ver detalle <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div class="card history-empty-card">
+            <div class="card-body p-5 text-center">
+                <i class="fas fa-receipt fa-3x text-danger mb-3"></i>
+                <h2 class="h3 fw-bold">Aun no tienes historial registrado</h2>
+                <p class="text-muted mb-0">Tus eventos de asignacion, recojo y entrega apareceran aqui.</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

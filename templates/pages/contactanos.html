@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Contáctanos | Delivery NATIVO{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="text-center mb-5">
+                <h1 class="fw-bold text-dark mb-3">Estamos aquí para ayudarte</h1>
+                <p class="text-muted">¿Tienes alguna duda o sugerencia? Déjanos un mensaje y te responderemos a la brevedad.</p>
+            </div>
+            <div class="card border-0 shadow-sm rounded-4 p-4 p-lg-5">
+                <form id="contact-form" onsubmit="event.preventDefault(); alert('¡Gracias por contactarnos! Tu mensaje ha sido enviado con éxito.'); this.reset();">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-muted small">Nombre Completo</label>
+                        <input type="text" class="form-control rounded-3" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-muted small">Correo Electrónico</label>
+                        <input type="email" class="form-control rounded-3" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-muted small">Asunto</label>
+                        <select class="form-select rounded-3" required>
+                            <option value="">Selecciona una opción...</option>
+                            <option value="1">Duda sobre un pedido</option>
+                            <option value="2">Problema con mi cuenta</option>
+                            <option value="3">Sugerencias o reclamos</option>
+                            <option value="4">Otros</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-muted small">Mensaje</label>
+                        <textarea class="form-control rounded-3" rows="4" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-danger w-100 rounded-pill fw-bold py-2">Enviar Mensaje</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

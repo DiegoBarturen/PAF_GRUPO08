@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+
+{% block title %}Delivery NATIVO | Pide lo que quieras{% endblock %}
+
+{% block extra_js %}
+<style>
+    body { background-color: #fcfcfc; }
+    
+    .unified-container { max-width: 1200px; margin: 0 auto; padding: 15px 20px; }
+    
+    /* 1. Cabecera de Ubicación */
+    .location-header {
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        margin-bottom: 25px; padding-top: 10px;
+    }
+    .location-header .city-name { font-weight: 800; font-size: 1.1rem; color: #111; cursor: pointer; }
+    .location-header .city-name:hover { color: #e11d48; }
+
+    /* 2. Banner de Primera Compra (Hero Unificado) */
+    .promo-hero {
+        background: linear-gradient(135deg, #e11d48 0%, #ff4b2b 100%);
+        border-radius: 24px; padding: 40px 30px; color: white;
+        display: flex; flex-direction: column; justify-content: center;
+        box-shadow: 0 10px 30px rgba(225, 29, 72, 0.2); margin-bottom: 35px;
+        position: relative; overflow: hidden;
+    }
+    /* Decoración de fondo del banner */
+    .promo-hero::after {
+        content: '\f0f5'; font-family: 'Font Awesome 5 Free'; font-weight: 900;
+        position: absolute; right: -20px; bottom: -40px; font-size: 15rem;
+        color: rgba(255,255,255,0.1); transform: rotate(-15deg); pointer-events: none;
+    }
+    .promo-badge {
+        background: #ffc107; color: #000; font-weight: 800; font-size: 0.85rem;
+        padding: 6px 12px; border-radius: 20px; width: fit-content; margin-bottom: 15px;
+        text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .promo-title { font-size: 2.2rem; font-weight: 900; margin-bottom: 10px; line-height: 1.2; }
+    .promo-subtitle { font-size: 1.1rem; opacity: 0.9; margin-bottom: 25px; max-width: 500px; }
+    
+    /* Buscador Integrado en el Banner */
+    .search-inside-hero {
+        background: white; border-radius: 50px; padding: 8px 8px 8px 25px;
+        display: flex; align-items: center; max-width: 600px; width: 100%;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .search-inside-hero input {
+        border: none; background: transparent; flex-grow: 1; outline: none;
+        font-weight: 500; font-size: 1.05rem; color: #111;
+    }
+    .search-inside-hero .btn-search {
+        background: #111; color: white; border-radius: 50px; padding: 12px 30px;
+        border: none; font-weight: 700; transition: background 0.2s;
+    }
+    .search-inside-hero .btn-search:hover { background: #333; }
+
+    /* 3. Accesos Rápidos (Categorías) */
+    .quick-categories { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 20px; scrollbar-width: none; margin-bottom: 20px; }
+    .quick-categories::-webkit-scrollbar { display: none; }
+    .cat-card {
+        min-width: 110px; padding: 15px 10px; background: #fff; border-radius: 20px;
+        border: 1px solid #f3f4f6; display: flex; flex-direction: column; align-items: center;
+        text-decoration: none; color: #111; transition: all 0.2s ease;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+    .cat-card:hover { transform: translateY(-5px); border-color: #e5e7eb; box-shadow: 0 8px 15px rgba(0,0,0,0.05); }
+    .cat-icon-wrap { width: 50px; height: 50px; border-radius: 50%; background: #fff1f2; color: #e11d48; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 10px; }
+    .cat-card span { font-weight: 700; font-size: 0.85rem; }
+
+    /* 4. Filtros y Ordenamiento */
+    .section-header-unified { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .filter-pill {
+        background: #fff; border: 1px solid #e5e7eb; border-radius: 20px; padding: 8px 16px;
+        font-size: 0.85rem; font-weight: 700; color: #374151; display: inline-flex; align-items: center; gap: 6px;
+        cursor: pointer; transition: background 0.2s;
+    }
+    .filter-pill:hover { background: #f9fafb; }
+
+    /* 5. Catálogo de Restaurantes (Grid) */
+    .unified-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
+    
+    .rest-card {
+        background: #fff; border: 1px solid transparent; border-radius: 16px; overflow: hidden;
+        text-decoration: none; color: inherit; display: block; transition: all 0.2s;
+    }
+    .rest-card:hover { border-color: #e5e7eb; box-shadow: 0 10px 20px rgba(0,0,0,0.04); transform: translateY(-3px); }
+    
+    .rest-cover { position: relative; height: 160px; background-color: #f3f4f6; }
+    .rest-cover img { width: 100%; height: 100%; object-fit: cover; }
+    
+    .badge-top { position: absolute; top: 12px; left: 12px; background: #fff; color: #111; font-size: 0.75rem; font-weight: 800; padding: 6px 10px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .badge-top.discount { background: #4ade80; color: #064e3b; }
+    
+    .rest-logo {
+        position: absolute; bottom: -20px; right: 20px; width: 60px; height: 60px;
+        border-radius: 12px; background: #fff; padding: 4px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .rest-logo img { width: 100%; height: 100%; border-radius: 8px; object-fit: cover; }
+    
+    .rest-body { padding: 25px 15px 15px 15px; }
+    .rest-title { font-weight: 800; font-size: 1.15rem; color: #111; margin-bottom: 4px; }
+    .rest-info-row { display: flex; align-items: center; gap: 15px; font-size: 0.85rem; color: #6b7280; font-weight: 500; }
+    .rest-rating { color: #111; font-weight: 700; display: flex; align-items: center; gap: 4px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="unified-container">
+
+    <div class="location-header">
+        <i class="fas fa-map-marker-alt text-danger"></i>
+        <span class="text-muted small">Entregando en:</span>
+        <span class="city-name">Chiclayo <i class="fas fa-chevron-down ms-1 small"></i></span>
+    </div>
+
+    <div class="promo-hero">
+        <div class="promo-badge"><i class="fas fa-gift me-1"></i> Especial para ti</div>
+        <h1 class="promo-title">50% de descuento<br>en tu primera compra</h1>
+        <p class="promo-subtitle">Pide tus platos favoritos de los mejores locales de la ciudad. Usa el código <strong>NATIVO50</strong> al pagar.</p>
+        
+        <form method="GET" action="" class="search-inside-hero">
+            <input type="text" name="q" placeholder="¿Qué se te antoja hoy? (Ej. Chifa, Hamburguesas...)" value="{{ buscar_query }}">
+            <button type="submit" class="btn-search">Buscar</button>
+        </form>
+    </div>
+
+    <div class="quick-categories">
+        <a href="#" class="cat-card">
+            <div class="cat-icon-wrap"><i class="fas fa-hamburger"></i></div>
+            <span>Restaurantes</span>
+        </a>
+        <a href="#" class="cat-card">
+            <div class="cat-icon-wrap bg-success bg-opacity-10 text-success"><i class="fas fa-shopping-basket"></i></div>
+            <span>Súper</span>
+        </a>
+        <a href="#" class="cat-card">
+            <div class="cat-icon-wrap bg-info bg-opacity-10 text-info"><i class="fas fa-pills"></i></div>
+            <span>Farmacia</span>
+        </a>
+        <a href="#" class="cat-card">
+            <div class="cat-icon-wrap bg-warning bg-opacity-10 text-warning"><i class="fas fa-ice-cream"></i></div>
+            <span>Postres</span>
+        </a>
+        <a href="#" class="cat-card">
+            <div class="cat-icon-wrap bg-secondary bg-opacity-10 text-secondary"><i class="fas fa-wine-glass-alt"></i></div>
+            <span>Licores</span>
+        </a>
+        <a href="#" class="cat-card">
+            <div class="cat-icon-wrap bg-primary bg-opacity-10 text-primary"><i class="fas fa-paw"></i></div>
+            <span>Mascotas</span>
+        </a>
+    </div>
+
+    <div class="section-header-unified mt-4">
+        <h3 class="fw-bold m-0 text-dark">Locales Destacados</h3>
+        <div class="d-flex gap-2">
+            <div class="filter-pill"><i class="fas fa-sliders-h"></i> Filtros</div>
+            <div class="filter-pill d-none d-md-flex">Calificación <i class="fas fa-chevron-down small"></i></div>
+        </div>
+    </div>
+
+    <div class="unified-grid mb-5">
+        {% for negocio in negocios %}
+        <a href="{% url 'detalle_sede' negocio.id %}" class="rest-card">
+            <div class="rest-cover">
+                {% if forloop.counter|divisibleby:2 %}
+                    <span class="badge-top discount"><i class="fas fa-tag"></i> Envío Gratis</span>
+                {% else %}
+                    <span class="badge-top"><i class="fas fa-clock"></i> 15-30 min</span>
+                {% endif %}
+                
+                <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80" alt="Portada de {{ negocio.nombre_comercial }}">
+                
+                <div class="rest-logo">
+                    <img src="https://ui-avatars.com/api/?name={{ negocio.nombre_comercial }}&background=random&color=fff&size=100" alt="Logo">
+                </div>
+            </div>
+            <div class="rest-body">
+                <h4 class="rest-title text-truncate">{{ negocio.nombre_comercial }}</h4>
+                <div class="rest-info-row">
+                    <span class="rest-rating"><i class="fas fa-star text-warning"></i> 4.{{ forloop.counter|add:"3" }}</span>
+                    <span>•</span>
+                    <span>S/ {% if negocio.abierto %}3.50{% else %}0.00{% endif %} envío</span>
+                    <span>•</span>
+                    <span>{% if negocio.abierto %}<span class="text-success fw-bold">Abierto</span>{% else %}<span class="text-danger fw-bold">Cerrado</span>{% endif %}</span>
+                </div>
+            </div>
+        </a>
+        {% empty %}
+        <div class="col-12 text-center py-5" style="grid-column: 1 / -1;">
+            <i class="fas fa-store-slash fa-3x text-muted mb-3 opacity-50"></i>
+            <h4 class="fw-bold text-dark">Aún no hay locales en tu zona</h4>
+            <p class="text-muted">Estamos trabajando para traer los mejores restaurantes a tu ciudad.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}

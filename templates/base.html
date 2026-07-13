@@ -1,0 +1,467 @@
+{% load l10n %}<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Delivery NATIVO{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+            color: #1f2937;
+        }
+        .navbar {
+            background-color: #ffffff !important;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            padding: 0.8rem 0;
+            transition: all 0.3s;
+        }
+        .navbar-brand {
+            font-size: 1.4rem;
+            letter-spacing: -0.5px;
+        }
+        .nav-link {
+            color: #4b5563 !important;
+            transition: color 0.25s, transform 0.25s;
+            font-size: 0.95rem;
+        }
+        .nav-link:hover {
+            color: #dc3545 !important;
+        }
+        .dropdown-menu {
+            border: 0 !important;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08) !important;
+            border-radius: 16px !important;
+            padding: 0.6rem !important;
+        }
+        .dropdown-item {
+            border-radius: 8px !important;
+            padding: 0.6rem 1rem !important;
+            color: #374151 !important;
+            font-size: 0.9rem !important;
+            transition: all 0.2s;
+        }
+        .dropdown-item:hover {
+            background-color: #fff1f2 !important;
+            color: #e11d48 !important;
+        }
+        .card {
+            border-radius: 20px !important;
+            border: 1px solid rgba(0, 0, 0, 0.04) !important;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.02) !important;
+            transition: transform 0.25s, box-shadow 0.25s;
+        }
+        .form-control, .form-select {
+            border-radius: 12px !important;
+            border: 1px solid #e2e8f0 !important;
+            padding: 0.6rem 1rem !important;
+            font-size: 0.95rem !important;
+            transition: border-color 0.25s, box-shadow 0.25s !important;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #f87171 !important;
+            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1) !important;
+            outline: none !important;
+        }
+    </style>
+    {% if user.is_authenticated and user.es_cliente %}
+        {% if request.resolver_match and request.resolver_match.url_name != 'login' and request.resolver_match.url_name != 'registro' and request.resolver_match.url_name != 'logout' %}
+            {% if not user.telefono or not user.direccion or not user.first_name or not user.last_name or not user.latitud or not user.longitud %}
+                <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+            {% endif %}
+        {% endif %}
+    {% endif %}
+</head>
+<body class="bg-light">
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm">
+        <div class="container">
+            {% if user.is_authenticated %}
+                {% if user.es_negocio %}
+                    {% if user.negocio %}
+                        <a class="navbar-brand fw-bold text-danger d-flex align-items-center" href="{% url 'pedidos:panel_negocio' %}">
+                    {% else %}
+                        <a class="navbar-brand fw-bold text-danger d-flex align-items-center" href="{% url 'registrar_negocio' %}">
+                    {% endif %}
+                {% elif user.es_repartidor %}
+                    <a class="navbar-brand fw-bold text-danger d-flex align-items-center" href="{% url 'logistica:mi_pedido_activo' %}">
+                {% elif user.es_admin %}
+                    <a class="navbar-brand fw-bold text-danger d-flex align-items-center" href="{% url 'dashboard_inicio' %}">
+                {% else %}
+                    <a class="navbar-brand fw-bold text-danger d-flex align-items-center" href="{% url 'home' %}">
+                {% endif %}
+            {% else %}
+                <a class="navbar-brand fw-bold text-danger d-flex align-items-center" href="{% url 'home' %}">
+            {% endif %}
+                <i class="fas fa-motorcycle me-2 text-danger fs-3"></i>
+                <span style="font-weight: 800; letter-spacing: -1px; color: #1f2937;">Delivery <span class="text-danger">NATIVO</span></span>
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    {% if not user.is_authenticated or user.es_cliente or user.es_admin %}
+                    <li class="nav-item">
+                        <a href="{% url 'home_negocios' %}" class="nav-link text-dark fw-semibold">Catálogo</a>
+                    </li>
+                    {% endif %}
+
+                    {% if user.is_authenticated %}
+                        {% if user.es_cliente %}
+                        <li class="nav-item"><a class="nav-link text-dark fw-semibold" href="{% url 'pedidos:historial_cliente' %}">Mis Pedidos</a></li>
+                        <li class="nav-item"><a class="nav-link text-dark fw-semibold" href="{% url 'pedidos:ver_carrito' %}"><i class="fas fa-shopping-cart me-1 text-danger"></i> Carrito</a></li>
+                        {% endif %}
+
+                        {% if user.es_negocio %}
+                        <li class="nav-item"><a class="nav-link text-dark fw-semibold" href="{% url 'registrar_negocio' %}">Mi Establecimiento</a></li>
+                            {% if user.negocio %}
+                            <li class="nav-item"><a class="nav-link text-dark fw-semibold" href="{% url 'pedidos:panel_negocio' %}">Pedidos Entrantes</a></li>
+                            <li class="nav-item"><a class="nav-link text-dark fw-semibold" href="{% url 'administrar_productos' %}">Mis Productos</a></li>
+                            {% endif %}
+                        {% endif %}
+
+                        {% if user.es_repartidor %}
+                        <li class="nav-item"><a class="nav-link text-dark fw-semibold" href="{% url 'logistica:solicitudes_disponibles' %}">Solicitudes</a></li>
+                        <li class="nav-item"><a class="nav-link text-dark fw-semibold" href="{% url 'logistica:mi_pedido_activo' %}">Mi Ruta Activa</a></li>
+                        {% endif %}
+
+                        {% if user.es_admin %}
+                        <li class="nav-item"><a class="nav-link text-dark fw-semibold" href="{% url 'dashboard_inicio' %}">Dashboard Global</a></li>
+                        {% endif %}
+                    {% endif %}
+                </ul>
+
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark fw-bold" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle me-1 text-danger fs-5"></i> {{ user.username }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3">
+                                {% if sede_actual %}
+                                <li>
+                                    <h6 class="dropdown-header">Sede actual: {{ sede_actual.nombre }}</h6>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item fw-semibold" href="{% url 'seleccionar_sede' %}">
+                                        <i class="fas fa-exchange-alt me-2 text-muted"></i>Cambiar Sede
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                {% endif %}
+                                <li><a class="dropdown-item fw-semibold" href="{% url 'perfil' %}"><i class="fas fa-id-card me-2 text-muted"></i>Mi Perfil</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form action="{% url 'logout' %}" method="post" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item text-danger fw-bold">
+                                            <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        {% url 'login' as login_url %}
+                        {% url 'registro' as registro_url %}
+
+                        {% if request.path != login_url and request.path != registro_url %}
+                            <li class="nav-item">
+                                <a class="nav-link text-dark fw-semibold" href="{{ login_url }}">Iniciar Sesión</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="btn btn-danger ms-2 fw-bold text-white rounded-pill px-4 shadow-sm" href="{{ registro_url }}">Registrarse</a>
+                            </li>
+                        {% endif %}
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-3">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <main class="container my-4">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- FOOTER DINÁMICO -->
+    <footer class="bg-dark text-light py-5 mt-auto">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <h5 class="fw-bold mb-3 text-white"><i class="fas fa-motorcycle text-danger me-2"></i>Delivery NATIVO</h5>
+                    <p class="text-light small">
+                        Conectando los mejores sabores con tu hogar de forma rápida, segura y confiable.
+                    </p>
+                </div>
+                
+                <div class="col-lg-4 col-md-6">
+                    <h5 class="fw-bold mb-3 text-white">Enlaces Útiles</h5>
+                    <ul class="list-unstyled text-light small">
+                        {% if user.is_authenticated %}
+                            {% if user.es_cliente %}
+                                <li class="mb-2"><a href="{% url 'quienes_somos' %}" class="text-decoration-none text-light nav-link-hover">Quiénes Somos</a></li>
+                                <li class="mb-2"><a href="{% url 'contactanos' %}" class="text-decoration-none text-light nav-link-hover">Contáctanos</a></li>
+                                <li class="mb-2"><a href="{% url 'terminos' %}" class="text-decoration-none text-light nav-link-hover">Términos y Condiciones</a></li>
+                                <li class="mb-2"><a href="{% url 'privacidad' %}" class="text-decoration-none text-light nav-link-hover">Política de Privacidad</a></li>
+                            {% elif user.es_negocio %}
+                                <li class="mb-2"><a href="{% url 'quienes_somos' %}" class="text-decoration-none text-light nav-link-hover">Quiénes Somos</a></li>
+                                <li class="mb-2"><a href="{% url 'soporte_negocios' %}" class="text-decoration-none text-light nav-link-hover">Soporte para Comercios</a></li>
+                                <li class="mb-2"><a href="{% url 'terminos' %}" class="text-decoration-none text-light nav-link-hover">Términos para Comercios</a></li>
+                                <li class="mb-2"><a href="{% url 'privacidad' %}" class="text-decoration-none text-light nav-link-hover">Política de Privacidad</a></li>
+                            {% elif user.es_repartidor %}
+                                <li class="mb-2"><a href="{% url 'quienes_somos' %}" class="text-decoration-none text-light nav-link-hover">Quiénes Somos</a></li>
+                                <li class="mb-2"><a href="{% url 'soporte_repartidores' %}" class="text-decoration-none text-light nav-link-hover">Soporte para Repartidores</a></li>
+                                <li class="mb-2"><a href="{% url 'terminos' %}" class="text-decoration-none text-light nav-link-hover">Términos para Repartidores</a></li>
+                                <li class="mb-2"><a href="{% url 'privacidad' %}" class="text-decoration-none text-light nav-link-hover">Guía de Seguridad</a></li>
+                            {% elif user.es_admin %}
+                                <li class="mb-2"><a href="{% url 'quienes_somos' %}" class="text-decoration-none text-light nav-link-hover">Quiénes Somos</a></li>
+                                <li class="mb-2"><a href="{% url 'contactanos' %}" class="text-decoration-none text-light nav-link-hover">Soporte General</a></li>
+                            {% endif %}
+                        {% else %}
+                            <li class="mb-2"><a href="{% url 'quienes_somos' %}" class="text-decoration-none text-light nav-link-hover">Quiénes Somos</a></li>
+                            <li class="mb-2"><a href="{% url 'contactanos' %}" class="text-decoration-none text-light nav-link-hover">Contáctanos</a></li>
+                            <li class="mb-2"><a href="{% url 'terminos' %}" class="text-decoration-none text-light nav-link-hover">Términos y Condiciones</a></li>
+                            <li class="mb-2"><a href="{% url 'privacidad' %}" class="text-decoration-none text-light nav-link-hover">Política de Privacidad</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+
+                <div class="col-lg-4 col-md-12">
+                    <h5 class="fw-bold mb-3 text-white">Únete a Nosotros</h5>
+                    <ul class="list-unstyled text-light small">
+                        {% if not user.is_authenticated or user.es_cliente %}
+                        <li class="mb-2"><a href="{% url 'registro' %}" class="text-decoration-none text-light nav-link-hover"><i class="fas fa-store text-warning me-2"></i>¿Tienes un Restaurante?</a></li>
+                        <li class="mb-2"><a href="{% url 'registro' %}" class="text-decoration-none text-light nav-link-hover"><i class="fas fa-motorcycle text-success me-2"></i>Únete como Repartidor</a></li>
+                        {% endif %}
+                        <li class="mb-2 mt-3">
+                            <a href="#" class="text-light me-3 fs-5"><i class="fab fa-facebook"></i></a>
+                            <a href="#" class="text-light me-3 fs-5"><i class="fab fa-instagram"></i></a>
+                            <a href="#" class="text-light fs-5"><i class="fab fa-twitter"></i></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="border-secondary mt-4 mb-3">
+            <div class="text-center text-light small">
+                &copy; 2026 Delivery NATIVO. Todos los derechos reservados.
+            </div>
+        </div>
+    </footer>
+    <style>
+        body { display: flex; flex-direction: column; min-height: 100vh; }
+        .nav-link-hover:hover { color: #fff !important; text-decoration: underline !important; }
+    </style>
+    <!-- FIN FOOTER -->
+
+    {% if user.is_authenticated and user.es_cliente %}
+        {% if request.resolver_match and request.resolver_match.url_name != 'login' and request.resolver_match.url_name != 'registro' and request.resolver_match.url_name != 'logout' %}
+            {% if not user.telefono or not user.direccion or not user.first_name or not user.last_name or not user.latitud or not user.longitud %}
+                <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+        
+        <!-- Modal de Registro de Perfil Obligatorio -->
+        <div class="modal fade" id="perfilObligatorioModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="perfilObligatorioModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg rounded-4">
+                    <div class="modal-header bg-danger text-white border-0 py-3 rounded-top-4">
+                        <h5 class="modal-title fw-bold" id="perfilObligatorioModalLabel">
+                            <i class="fas fa-user-edit me-2"></i>Completa tu Perfil
+                        </h5>
+                    </div>
+                    <div class="modal-body p-4">
+                        <p class="text-muted small mb-4">Para poder comprar en Delivery NATIVO, por favor completa tus datos personales y tu ubicación exacta de entrega.</p>
+                        
+                        <div id="modal-error-alert" class="alert alert-danger d-none rounded-3 small"></div>
+
+                        <form id="perfil-obligatorio-form">
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <label class="form-label fw-bold text-muted small">Nombre</label>
+                                    <input type="text" id="modal-first-name" class="form-control rounded-3" placeholder="Ej. Juan" value="{{ user.first_name|default:'' }}" required>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label fw-bold text-muted small">Apellidos</label>
+                                    <input type="text" id="modal-last-name" class="form-control rounded-3" placeholder="Ej. Pérez" value="{{ user.last_name|default:'' }}" required>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label fw-bold text-muted small">Teléfono de contacto</label>
+                                    <input type="tel" id="modal-telefono" class="form-control rounded-3" placeholder="Ej. 999999999" value="{{ user.telefono|default:'' }}" required>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label fw-bold text-muted small">Dirección de Entrega</label>
+                                    <input type="text" id="modal-direccion" class="form-control rounded-3" placeholder="Ej. Av. Larco 123, Dpto 402" value="{{ user.direccion|default:'' }}" required>
+                                </div>
+                                
+                                <!-- Coordenadas -->
+                                <input type="hidden" id="modal-latitud" value="{{ user.latitud|unlocalize|default:'' }}">
+                                <input type="hidden" id="modal-longitud" value="{{ user.longitud|unlocalize|default:'' }}">
+                                
+                                <div class="col-12">
+                                    <label class="form-label fw-bold text-muted small">
+                                        <i class="fas fa-map-marker-alt text-danger me-1"></i>Ubica tu casa en el mapa
+                                    </label>
+                                    <div id="modal-mapa" class="rounded border mb-3" style="height: 250px; position: relative; z-index: 1;"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex gap-2 mt-2">
+                                <a href="{% url 'logout' %}" class="btn btn-outline-secondary w-50 fw-bold py-2 rounded-pill small">
+                                    <i class="fas fa-sign-out-alt me-1"></i>Cerrar Sesión
+                                </a>
+                                <button type="submit" id="btn-guardar-perfil-modal" class="btn btn-danger w-50 fw-bold py-2 rounded-pill shadow-sm">
+                                    <i class="fas fa-save me-1"></i>Guardar y Seguir
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const modalElement = document.getElementById('perfilObligatorioModal');
+                if (modalElement) {
+                    const modal = new bootstrap.Modal(modalElement, {
+                        backdrop: 'static',
+                        keyboard: false
+                    });
+                    modal.show();
+
+                    modalElement.addEventListener('shown.bs.modal', function () {
+                        const latInput = document.getElementById('modal-latitud');
+                        const lonInput = document.getElementById('modal-longitud');
+
+                        let initialLat = parseFloat(latInput.value.replace(',', '.'));
+                        let initialLon = parseFloat(lonInput.value.replace(',', '.'));
+                        let hasCoords = true;
+
+                        if (isNaN(initialLat) || isNaN(initialLon) || (Math.abs(initialLat) < 0.01 && Math.abs(initialLon) < 0.01)) {
+                            initialLat = -12.046374;
+                            initialLon = -77.042793;
+                            hasCoords = false;
+                        }
+
+                        const map = L.map('modal-mapa').setView([initialLat, initialLon], hasCoords ? 16 : 13);
+
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            attribution: '&copy; OpenStreetMap contributors'
+                        }).addTo(map);
+
+                        const marker = L.marker([initialLat, initialLon], {
+                            draggable: true
+                        }).addTo(map);
+
+                        function updateCoords(latVal, lonVal) {
+                            latInput.value = Number(latVal).toFixed(6);
+                            lonInput.value = Number(lonVal).toFixed(6);
+                        }
+
+                        // Inicializar coordenadas
+                        updateCoords(initialLat, initialLon);
+
+                        // Si no tiene coordenadas previas, intentar usar geolocalización
+                        if (!hasCoords && navigator.geolocation) {
+                            navigator.geolocation.getCurrentPosition(
+                                (position) => {
+                                    const lat = position.coords.latitude;
+                                    const lon = position.coords.longitude;
+                                    map.setView([lat, lon], 16);
+                                    marker.setLatLng([lat, lon]);
+                                    updateCoords(lat, lon);
+                                },
+                                (err) => {
+                                    console.log("Geolocalización declinada o fallida.");
+                                }
+                            );
+                        }
+
+                        // Actualizar en arrastre
+                        marker.on('dragend', function () {
+                            const pos = marker.getLatLng();
+                            updateCoords(pos.lat, pos.lng);
+                        });
+
+                        // Actualizar en clic
+                        map.on('click', function (e) {
+                            marker.setLatLng(e.latlng);
+                            updateCoords(e.latlng.lat, e.latlng.lng);
+                        });
+                    });
+
+                    // Controlar envío del formulario
+                    const form = document.getElementById('perfil-obligatorio-form');
+                    const errorAlert = document.getElementById('modal-error-alert');
+                    const saveBtn = document.getElementById('btn-guardar-perfil-modal');
+
+                    form.addEventListener('submit', async function (e) {
+                        e.preventDefault();
+                        
+                        errorAlert.classList.add('d-none');
+                        errorAlert.textContent = '';
+                        saveBtn.disabled = true;
+                        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Guardando...';
+
+                        const payload = {
+                            first_name: document.getElementById('modal-first-name').value,
+                            last_name: document.getElementById('modal-last-name').value,
+                            telefono: document.getElementById('modal-telefono').value,
+                            direccion: document.getElementById('modal-direccion').value,
+                            latitud: document.getElementById('modal-latitud').value,
+                            longitud: document.getElementById('modal-longitud').value
+                        };
+
+                        try {
+                            const response = await fetch("{% url 'api_actualizar_perfil' %}", {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRFToken': '{{ csrf_token }}'
+                                },
+                                body: JSON.stringify(payload)
+                            });
+
+                            const data = await response.json();
+
+                            if (!response.ok) {
+                                throw new Error(data.detail || 'Ocurrió un error al guardar los datos.');
+                            }
+
+                            // Éxito: recargar página
+                            window.location.reload();
+                        } catch (error) {
+                            errorAlert.textContent = error.message;
+                            errorAlert.classList.remove('d-none');
+                            saveBtn.disabled = false;
+                            saveBtn.innerHTML = '<i class="fas fa-save me-2"></i>Guardar y Continuar';
+                        }
+                    });
+                }
+            });
+        </script>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+{% block extra_js %}{% endblock %}  
+</body>
+</html>

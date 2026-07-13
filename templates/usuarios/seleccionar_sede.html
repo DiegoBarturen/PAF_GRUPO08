@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Seleccionar Sede | Delivery NATIVO{% endblock %}
+
+{% block content %}
+<div class="container py-5 mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-body p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-store fa-3x text-danger mb-3"></i>
+                        <h3 class="fw-bold text-dark">Selecciona tu Sede</h3>
+                        <p class="text-muted">Tienes acceso a múltiples sedes. ¿Con cuál deseas trabajar hoy?</p>
+                    </div>
+
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="mb-4">
+                            <label for="sede_id" class="form-label fw-bold">Mis Sedes Asignadas</label>
+                            <select name="sede_id" id="sede_id" class="form-select form-select-lg" required>
+                                <option value="" disabled selected>-- Elige una sede --</option>
+                                {% for sede in sedes %}
+                                <option value="{{ sede.id }}">{{ sede.nombre }} ({{ sede.negocio.nombre_comercial }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-danger w-100 py-2 fw-bold rounded-pill shadow-sm">
+                            <i class="fas fa-sign-in-alt me-2"></i> Ingresar al Panel
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

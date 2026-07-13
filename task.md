@@ -1,0 +1,10 @@
+- `[x]` Create `Sede` model linked to `Negocio` and update relations
+- `[x]` Create `UsuarioSede` model for role-based access control
+- `[x]` Update `Pedido` model to reference `Sede` instead of `Negocio`
+- `[x]` Run migrations to rebuild database schema
+- `[x]` Refactor login view and middleware to handle Multi-Sede sessions
+- `[x]` Create template for `Sede` selection (`seleccionar_sede.html`)
+- `[x]` Update `registrar_negocio` to create default `Sede`
+- `[x]` Update orders panel to filter orders by the current `Sede`
+- `[x]` Implement UI element in header to switch active `Sede`
+- `[x]` Verify that orders and products are segregated by `Sede`

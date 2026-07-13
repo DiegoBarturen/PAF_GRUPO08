@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Mis Sedes</h2>
+            <p class="text-muted">Administra todas las ubicaciones de {{ negocio.nombre_comercial }}</p>
+        </div>
+        <div>
+            <a href="{% url 'crear_sede' %}" class="btn btn-danger fw-bold rounded-pill px-4">
+                <i class="fas fa-plus me-2"></i>Nueva Sede
+            </a>
+            <a href="{% url 'pedidos:panel_negocio' %}" class="btn btn-outline-dark fw-bold rounded-pill px-4 ms-2">
+                Volver al Panel
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-4">Nombre de la Sede</th>
+                                    <th>Dirección</th>
+                                    <th>Teléfono</th>
+                                    <th>Costo Envío</th>
+                                    <th>Estado</th>
+                                    <th class="text-end pe-4">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for sede in sedes %}
+                                <tr>
+                                    <td class="ps-4">
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                                <i class="fas fa-store text-danger"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="fw-bold m-0 text-dark">{{ sede.nombre }}</h6>
+                                                <small class="text-muted">ID: {{ sede.id }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>{{ sede.direccion }}</td>
+                                    <td>{{ sede.telefono }}</td>
+                                    <td class="fw-bold">S/ {{ sede.costo_envio }}</td>
+                                    <td>
+                                        <form method="POST" action="{% url 'activar_desactivar_sede' sede.id %}">
+                                            {% csrf_token %}
+                                            {% if sede.estado %}
+                                            <button type="submit" class="btn btn-sm btn-success rounded-pill fw-bold px-3">
+                                                <i class="fas fa-check-circle me-1"></i> Activa
+                                            </button>
+                                            {% else %}
+                                            <button type="submit" class="btn btn-sm btn-danger rounded-pill fw-bold px-3">
+                                                <i class="fas fa-times-circle me-1"></i> Inactiva
+                                            </button>
+                                            {% endif %}
+                                        </form>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <a href="{% url 'editar_sede' sede.id %}" class="btn btn-sm btn-light border fw-bold text-dark rounded-3">
+                                            <i class="fas fa-edit me-1"></i> Editar
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-5 text-muted">
+                                        <i class="fas fa-store-slash fa-3x mb-3 opacity-50"></i>
+                                        <h5>No tienes sedes registradas.</h5>
+                                        <p>Agrega tu primera sede para empezar a recibir pedidos.</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

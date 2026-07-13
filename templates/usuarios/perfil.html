@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Mi Perfil | Delivery NATIVO{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4 mb-5">
+    <div class="col-md-7">
+        <div class="card shadow-lg border-0 rounded-4">
+            <div class="card-header bg-white py-4 border-bottom-0">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="bg-danger bg-opacity-10 text-danger rounded-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; border-radius: 12px !important;">
+                        <i class="fas fa-id-card fs-4"></i>
+                    </div>
+                    <div>
+                        <h4 class="mb-0 fw-bold text-dark">Mi Perfil</h4>
+                        <p class="text-muted small mb-0">Gestiona tus datos personales y credenciales de contacto</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" class="d-grid gap-3">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted text-uppercase mb-1">Nombre de Usuario</label>
+                            <input type="text" class="form-control bg-light border-0 fw-semibold" value="{{ user.username }}" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted text-uppercase mb-1">Rol en la Plataforma</label>
+                            <input type="text" class="form-control bg-light border-0 fw-semibold text-danger" value="{{ user.get_rol_display }}" readonly>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold small text-muted text-uppercase mb-1">Correo Electrónico</label>
+                            <input type="email" name="email" class="form-control" value="{{ user.email }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted text-uppercase mb-1">Teléfono de Contacto</label>
+                            <input type="text" name="telefono" class="form-control" value="{{ user.telefono|default:'' }}" placeholder="Ej. 999999999">
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold small text-muted text-uppercase mb-1">Dirección Principal</label>
+                            <textarea name="direccion" class="form-control" rows="2" placeholder="Ingresa tu dirección de domicilio completa">{{ user.direccion|default:'' }}</textarea>
+                        </div>
+                    </div>
+                    <div class="d-grid mt-3">
+                        <button type="submit" class="btn btn-danger btn-lg fw-bold rounded-pill shadow-sm">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

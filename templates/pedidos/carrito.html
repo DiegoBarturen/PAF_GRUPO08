@@ -1,0 +1,340 @@
+{% extends 'base.html' %}
+
+{% block title %}Mi Carrito | Delivery NATIVO{% endblock %}
+
+{% block extra_js %}
+<style>
+    .cart-item { transition: background-color 0.2s; }
+    .cart-item:hover { background-color: #f8f9fa; }
+    .qty-control { border-radius: 20px; overflow: hidden; border: 1px solid #dee2e6; background: white; }
+    .qty-control .btn { border: none; background: transparent; font-weight: bold; color: #dc3545; }
+    .qty-control .btn:hover { background: #ffe6e6; }
+    .qty-control span { min-width: 40px; text-align: center; display: inline-block; font-weight: 600; }
+    .sugerencias-scroll { display: flex; overflow-x: auto; gap: 1rem; padding-bottom: 10px; scrollbar-width: none; }
+    .sugerencias-scroll::-webkit-scrollbar { display: none; }
+    
+    /* Para que el panel de pago siga al usuario al hacer scroll en PC */
+    @media (min-width: 992px) {
+        .sticky-checkout { position: sticky; top: 20px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    
+    <div class="d-flex align-items-center mb-4 pb-2 border-bottom">
+        <i class="fas fa-shopping-bag fa-2x text-danger me-3"></i>
+        <h2 class="fw-bold mb-0 text-dark">Tu Orden</h2>
+    </div>
+
+    {% if items_carrito %}
+        <div class="row g-4">
+            
+            <div class="col-lg-8">
+                
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-dark mb-0">
+                        {% if negocio_carrito %}
+                            <i class="fas fa-store text-muted me-2"></i> {{ negocio_carrito.nombre_comercial }}
+                        {% endif %}
+                    <a href="{% url 'detalle_sede' negocio_carrito.id %}" class="btn btn-sm btn-outline-danger rounded-pill fw-bold">
+                        + Añadir más
+                    </a>
+                </div>
+
+                <div class="card shadow-sm border-0 rounded-4 mb-4 overflow-hidden">
+                    <div class="card-body p-0">
+                        {% for item in items_carrito %}
+                        <div class="cart-item d-flex align-items-center justify-content-between p-4 {% if not forloop.last %}border-bottom{% endif %}">
+                            
+                            <div class="d-flex flex-column" style="max-width: 50%;">
+                                <h6 class="fw-bold text-dark mb-1">{{ item.producto.nombre }}</h6>
+                                <span class="text-danger fw-bold mb-2">S/ {{ item.producto.precio }}</span>
+                                <a href="{% url 'pedidos:eliminar_del_carrito' item.producto.id %}" 
+                                   class="text-muted small text-decoration-none"
+                                   onclick="return confirm('¿Seguro que deseas quitar este producto?');">
+                                    <i class="fas fa-trash-alt me-1"></i> Quitar
+                                </a>
+                            </div>
+
+                            <div class="d-flex align-items-center gap-3">
+                                <form action="{% url 'pedidos:actualizar_cantidad_carrito' item.producto.id %}" method="post" class="m-0">
+                                    {% csrf_token %}
+                                    <div class="qty-control d-flex align-items-center shadow-sm">
+                                        <button type="submit" name="cantidad" value="{{ item.cantidad|add:'-1' }}" class="btn px-3">-</button>
+                                        <span>{{ item.cantidad }}</span>
+                                        <button type="submit" name="cantidad" value="{{ item.cantidad|add:'1' }}" class="btn px-3">+</button>
+                                    </div>
+                                </form>
+                                <div class="fw-bold text-dark text-end" style="min-width: 70px;">
+                                    S/ {{ item.subtotal }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                {% if productos_sugeridos %}
+                <h5 class="fw-bold text-dark mb-3"><i class="fas fa-star text-warning me-2"></i> Completa tu orden</h5>
+                <div class="sugerencias-scroll mb-4">
+                    {% for sugerido in productos_sugeridos %}
+                    <div class="card shadow-sm border-0 rounded-4" style="min-width: 250px; max-width: 250px;">
+                        <div class="card-body p-3 d-flex align-items-center gap-3">
+                            {% if sugerido.imagen %}
+                            <img src="{{ sugerido.imagen.url }}" alt="{{ sugerido.nombre }}" class="rounded-3" style="width: 60px; height: 60px; object-fit: cover;">
+                            {% else %}
+                            <div class="rounded-3 bg-light d-flex align-items-center justify-content-center text-muted" style="width: 60px; height: 60px;">
+                                <i class="fas fa-utensils"></i>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="flex-grow-1">
+                                <h6 class="fw-bold mb-1 text-truncate" style="max-width: 140px; font-size: 0.9rem;">{{ sugerido.nombre }}</h6>
+                                <div class="text-success fw-bold small mb-2">S/ {{ sugerido.precio }}</div>
+                                
+                                <form action="{% url 'pedidos:agregar_al_carrito' sugerido.id %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="cantidad" value="1">
+                                    <button type="submit" class="btn btn-sm btn-light w-100 fw-bold border text-danger rounded-pill">
+                                        Agregar
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="col-lg-4">
+                <div class="sticky-checkout">
+                    <div class="card shadow-lg border-0 rounded-4 bg-white p-4">
+                        <h5 class="fw-bold text-dark mb-4 border-bottom pb-3">Resumen de Pago</h5>
+                        
+                        <div class="d-flex justify-content-between mb-2 text-muted">
+                            <span>Subtotal productos</span>
+                            <span>S/ {{ total_carrito|floatformat:2 }}</span>
+                        </div>
+                        {% if descuento > 0 %}
+                        <div class="d-flex justify-content-between mb-2 text-success fw-semibold">
+                            <span>Descuento (25% Prod.)</span>
+                            <span>- S/ {{ descuento|floatformat:2 }}</span>
+                        </div>
+                        {% endif %}
+                        <div class="d-flex justify-content-between mb-3 text-muted">
+                            <span>Costo de envío</span>
+                            <span>S/ {{ costo_envio|floatformat:2 }}</span>
+                        </div>
+
+                        <!-- Cupón de descuento -->
+                        <div class="mb-4 pt-3 border-top">
+                            <label class="form-label fw-bold text-muted small"><i class="fas fa-ticket-alt text-warning me-1"></i> ¿Tienes un cupón de primera compra?</label>
+                            {% if cupon_aplicado %}
+                                <div class="d-flex align-items-center justify-content-between p-2 rounded-3 bg-success bg-opacity-10 border border-success border-opacity-20" style="border-radius: 12px !important;">
+                                    <span class="text-success small fw-bold"><i class="fas fa-check-circle me-1"></i> {{ cupon_aplicado }} (25% desc. aplicado)</span>
+                                    <a href="{% url 'pedidos:remover_cupon' %}" class="btn btn-sm btn-link text-danger p-0 fw-bold text-decoration-none small">Remover</a>
+                                </div>
+                            {% else %}
+                                <form action="{% url 'pedidos:aplicar_cupon' %}" method="POST" class="d-flex gap-2">
+                                    {% csrf_token %}
+                                    <input type="text" name="codigo_cupon" class="form-control form-control-sm border" placeholder="Ej: NATIVO50" style="border-radius: 8px !important;">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm fw-bold px-3" style="border-radius: 8px !important;">Canjear</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center border-top pt-3 mb-4">
+                            <span class="fs-5 fw-bold text-dark">Total a pagar</span>
+                            <span class="fs-3 fw-bold text-danger">S/ {{ total_con_envio|floatformat:2 }}</span>
+                        </div>
+
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger rounded-3 small">
+                                {{ form.non_field_errors|join:", " }}
+                            </div>
+                        {% endif %}
+
+                        <form action="{% url 'pedidos:procesar_carrito' %}" method="POST" id="checkout-form">
+                            {% csrf_token %}
+                            {{ form.latitud.as_hidden }}
+                            {{ form.longitud.as_hidden }}
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-muted small"><i class="fas fa-map-marker-alt text-danger me-1"></i> Dirección de Entrega</label>
+                                {{ form.direccion_entrega }}
+                                {% if form.direccion_entrega.errors %}<div class="text-danger small mt-1">{{ form.direccion_entrega.errors|join:", " }}</div>{% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-muted small"><i class="fas fa-phone-alt text-success me-1"></i> Teléfono</label>
+                                {{ form.telefono }}
+                                {% if form.telefono.errors %}<div class="text-danger small mt-1">{{ form.telefono.errors|join:", " }}</div>{% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-muted small"><i class="fas fa-wallet text-primary me-1"></i> Método de Pago</label>
+                                {{ form.metodo_pago }}
+                                {% if form.metodo_pago.errors %}<div class="text-danger small mt-1">{{ form.metodo_pago.errors|join:", " }}</div>{% endif %}
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-bold text-muted small"><i class="fas fa-comment-dots text-secondary me-1"></i> Instrucciones especiales</label>
+                                {{ form.observaciones }}
+                                {% if form.observaciones.errors %}<div class="text-danger small mt-1">{{ form.observaciones.errors|join:", " }}</div>{% endif %}
+                            </div>
+
+                            <button type="submit" class="btn btn-danger btn-lg w-100 rounded-pill fw-bold shadow-sm" id="btn-hacer-pedido">
+                                Hacer Pedido
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    {% else %}
+        <div class="card shadow-sm border-0 rounded-4 text-center py-5 bg-white mx-auto" style="max-width: 600px;">
+            <div class="mb-4">
+                <i class="fas fa-motorcycle fa-4x text-muted opacity-25"></i>
+            </div>
+            <h4 class="fw-bold text-dark mb-3">Tu estómago está vacío</h4>
+            <p class="text-muted mb-4 px-4">Aún no has agregado ningún delicioso plato a tu carrito. ¡Explora nuestros restaurantes!</p>
+            <a href="{% url 'home_negocios' %}" class="btn btn-danger btn-lg px-5 rounded-pill shadow-sm fw-bold">
+                Ver Restaurantes
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Modal Pasarela de Pago Simulada -->
+<div class="modal fade" id="paymentGatewayModal" tabindex="-1" aria-labelledby="paymentGatewayModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow-lg">
+            <div class="modal-header bg-dark text-white rounded-top-4 border-0">
+                <h5 class="modal-title fw-bold" id="paymentGatewayModalLabel">
+                    <i class="fas fa-lock text-success me-2"></i> Pago Seguro en Línea
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 text-center" id="paymentGatewayBody">
+                
+                <!-- Contenido QR -->
+                <div id="payment-qr-view" class="d-none">
+                    <h6 class="fw-bold text-dark mb-3">Escanea el código para pagar</h6>
+                    <p class="text-muted small mb-4">Total a pagar: <strong class="text-danger fs-5">S/ {{ total_con_envio|floatformat:2 }}</strong></p>
+                    <div class="p-3 bg-light rounded-3 d-inline-block mb-3 border">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=NATIVO-DELIVERY-{{ request.user.username }}" alt="Código QR de Pago" class="img-fluid" width="180">
+                    </div>
+                    <p class="small text-muted mb-0"><i class="fas fa-info-circle me-1"></i> Usa Yape, Plin o la app de tu banco.</p>
+                </div>
+
+                <!-- Contenido Tarjeta -->
+                <div id="payment-card-view" class="d-none text-start">
+                    <h6 class="fw-bold text-dark mb-4 text-center">Datos de tu Tarjeta</h6>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">Número de Tarjeta</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0"><i class="fas fa-credit-card text-muted"></i></span>
+                            <input type="text" class="form-control border-start-0 ps-0" placeholder="0000 0000 0000 0000" maxlength="19" id="fake-card-num">
+                        </div>
+                    </div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <label class="form-label small fw-bold text-muted">Vencimiento</label>
+                            <input type="text" class="form-control" placeholder="MM/YY" maxlength="5" id="fake-card-exp">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-bold text-muted">CVV</label>
+                            <input type="password" class="form-control" placeholder="123" maxlength="4" id="fake-card-cvv">
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-muted small mb-0">Total a procesar: <strong class="text-danger fs-5">S/ {{ total_con_envio|floatformat:2 }}</strong></p>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer bg-light rounded-bottom-4 border-0 p-3 justify-content-center">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success rounded-pill px-5 fw-bold shadow-sm" id="btn-confirm-payment">
+                    <i class="fas fa-check-circle me-2"></i> Completar Pago
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const form = document.getElementById("checkout-form");
+        const methodSelect = document.getElementById("id_metodo_pago");
+        const paymentModal = new bootstrap.Modal(document.getElementById('paymentGatewayModal'));
+        const btnConfirm = document.getElementById("btn-confirm-payment");
+        const qrView = document.getElementById("payment-qr-view");
+        const cardView = document.getElementById("payment-card-view");
+
+        form.addEventListener("submit", function(e) {
+            const method = methodSelect.value;
+            if (method === "qr" || method === "tarjeta") {
+                e.preventDefault(); // Detener envío real
+                
+                // Configurar vistas
+                qrView.classList.add("d-none");
+                cardView.classList.add("d-none");
+
+                if (method === "qr") {
+                    qrView.classList.remove("d-none");
+                    btnConfirm.innerHTML = '<i class="fas fa-check-circle me-2"></i> Ya realicé el pago QR';
+                } else if (method === "tarjeta") {
+                    cardView.classList.remove("d-none");
+                    btnConfirm.innerHTML = '<i class="fas fa-lock me-2"></i> Pagar de forma segura';
+                    
+                    // Limpiar campos falsos
+                    document.getElementById("fake-card-num").value = "";
+                    document.getElementById("fake-card-exp").value = "";
+                    document.getElementById("fake-card-cvv").value = "";
+                }
+
+                // Mostrar modal
+                paymentModal.show();
+            }
+            // Si es efectivo o pos, el formulario sigue su curso normal.
+        });
+
+        btnConfirm.addEventListener("click", function() {
+            const method = methodSelect.value;
+            
+            // Validacion sencilla de campos de tarjeta
+            if (method === "tarjeta") {
+                const num = document.getElementById("fake-card-num").value;
+                const exp = document.getElementById("fake-card-exp").value;
+                const cvv = document.getElementById("fake-card-cvv").value;
+                if (!num || !exp || !cvv) {
+                    alert("Por favor, completa los datos de tu tarjeta simulada.");
+                    return;
+                }
+            }
+
+            // Cambiar estado a cargando
+            const originalText = btnConfirm.innerHTML;
+            btnConfirm.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Procesando pago...';
+            btnConfirm.disabled = true;
+
+            // Simular tiempo de carga (2 segundos)
+            setTimeout(() => {
+                btnConfirm.innerHTML = '<i class="fas fa-check me-2"></i> ¡Pago Exitoso!';
+                btnConfirm.classList.replace('btn-success', 'btn-primary');
+                
+                // Enviar el formulario real tras 800ms
+                setTimeout(() => {
+                    HTMLFormElement.prototype.submit.call(form);
+                }, 800);
+
+            }, 2000);
+        });
+    });
+</script>
+{% endblock %}
