@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+
+{% block title %}Mi Perfil | Delivery NATIVO{% endblock %}
+
+{% block extra_js %}
+<style>
+    body { background: #f7f7f7; }
+    .profile-header {
+        background: linear-gradient(135deg, #1e293b, #334155);
+        padding: 40px 0;
+        margin-bottom: 32px;
+    }
+    .avatar-circle {
+        width: 80px; height: 80px;
+        background: rgba(255,255,255,0.12);
+        border-radius: 50%; border: 3px solid rgba(255,255,255,0.25);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 2rem; color: white; margin: 0 auto 16px;
+    }
+    .profile-card {
+        background: #fff;
+        border-radius: 20px;
+        border: 1px solid #f1f5f9;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        overflow: hidden;
+        margin-bottom: 20px;
+    }
+    .profile-card-header {
+        padding: 20px 25px;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex; align-items: center; gap: 12px;
+    }
+    .card-icon {
+        width: 42px; height: 42px; border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.1rem;
+    }
+    .profile-card-body { padding: 25px; }
+    .field-label { font-weight: 700; font-size: 0.78rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: block; }
+    .input-field {
+        border: 2px solid #f1f5f9; border-radius: 12px;
+        padding: 12px 16px; font-size: 0.95rem; font-weight: 500;
+        background: #f8fafc; width: 100%; transition: all 0.2s;
+    }
+    .input-field:focus {
+        border-color: #dc2626; background: #fff;
+        box-shadow: 0 0 0 4px rgba(220,38,38,0.08); outline: none;
+    }
+    .input-field[readonly] { background: #f1f5f9; color: #6b7280; cursor: not-allowed; }
+    .btn-save {
+        background: linear-gradient(135deg, #dc2626, #ef4444);
+        color: white; border: none; border-radius: 12px;
+        padding: 13px 28px; font-weight: 700; font-size: 0.95rem;
+        transition: all 0.2s; box-shadow: 0 4px 12px rgba(220,38,38,0.25);
+    }
+    .btn-save:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(220,38,38,0.35); color: white; }
+    .rol-badge {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 5px 14px; border-radius: 20px;
+        font-size: 0.8rem; font-weight: 700;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="profile-header">
+    <div class="container text-center">
+        <div class="avatar-circle">
+            <i class="fas fa-user"></i>
+        </div>
+        <h2 class="fw-bold text-white mb-1">{{ user.get_full_name|default:user.username }}</h2>
+        <span class="rol-badge" style="background: rgba(255,255,255,0.15); color: white;">
+            <i class="fas fa-tag me-1"></i>{{ user.get_rol_display }}
+        </span>
+    </div>
+</div>
+
+<div class="container mb-5" style="max-width: 700px;">
+
+    <!-- Datos Personales -->
+    <div class="profile-card">
+        <div class="profile-card-header">
+            <div class="card-icon bg-danger bg-opacity-10 text-danger">
+                <i class="fas fa-id-card"></i>
+            </div>
+            <div>
+                <h6 class="fw-bold mb-0">Datos Personales</h6>
+                <small class="text-muted">Tu información de contacto y cuenta</small>
+            </div>
+        </div>
+        <div class="profile-card-body">
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="update_profile">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="field-label">Usuario</label>
+                        <input type="text" class="input-field" value="{{ user.username }}" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="field-label">Rol</label>
+                        <input type="text" class="input-field" value="{{ user.get_rol_display }}" readonly>
+                    </div>
+                    <div class="col-12">
+                        <label class="field-label">Correo Electrónico</label>
+                        <input type="email" name="email" class="input-field" value="{{ user.email }}" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="field-label">Teléfono</label>
+                        <input type="text" name="telefono" class="input-field" value="{{ user.telefono|default:'' }}" placeholder="999 999 999">
+                    </div>
+                    <div class="col-12">
+                        <label class="field-label">Dirección Principal</label>
+                        <textarea name="direccion" class="input-field" rows="2" placeholder="Tu dirección completa">{{ user.direccion|default:'' }}</textarea>
+                    </div>
+                    <div class="col-12 text-end">
+                        <button type="submit" class="btn-save">
+                            <i class="fas fa-save me-2"></i>Guardar Cambios
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Cambiar Contraseña -->
+    <div class="profile-card">
+        <div class="profile-card-header">
+            <div class="card-icon bg-warning bg-opacity-10 text-warning">
+                <i class="fas fa-lock"></i>
+            </div>
+            <div>
+                <h6 class="fw-bold mb-0">Cambiar Contraseña</h6>
+                <small class="text-muted">Actualiza tu contraseña de acceso</small>
+            </div>
+        </div>
+        <div class="profile-card-body">
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="change_password">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="field-label">Contraseña Actual</label>
+                        <input type="password" name="password_actual" class="input-field" placeholder="••••••••" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="field-label">Nueva Contraseña</label>
+                        <input type="password" name="password_nueva" class="input-field" placeholder="••••••••" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="field-label">Confirmar Nueva</label>
+                        <input type="password" name="password_confirm" class="input-field" placeholder="••••••••" required>
+                    </div>
+                    <div class="col-12 text-end">
+                        <button type="submit" class="btn-save" style="background: linear-gradient(135deg, #d97706, #f59e0b);">
+                            <i class="fas fa-key me-2"></i>Actualizar Contraseña
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

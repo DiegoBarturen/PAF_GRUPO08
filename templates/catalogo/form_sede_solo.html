@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <div class="bg-danger bg-opacity-10 text-danger rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px; font-size: 1.5rem;">
+                            <i class="fas fa-store-alt"></i>
+                        </div>
+                        <h3 class="fw-bold">{% if sede_id %}Editar Sede{% else %}Nueva Sede{% endif %}</h3>
+                        <p class="text-muted">Ingresa los datos de la ubicación.</p>
+                    </div>
+
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        {% for field in form %}
+                        <div class="mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label fw-bold">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.help_text %}
+                                <div class="form-text">{{ field.help_text }}</div>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        {% endfor %}
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-danger fw-bold rounded-pill py-3">
+                                <i class="fas fa-save me-2"></i> Guardar Sede
+                            </button>
+                            <a href="{% url 'gestionar_sedes' %}" class="btn btn-light fw-bold rounded-pill py-3">
+                                Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const latField = document.getElementById("id_latitud");
+        const lonField = document.getElementById("id_longitud");
+        
+        // Creamos contenedor para el mapa si no existe
+        let mapContainer = document.getElementById('sede-map');
+        if (!mapContainer) {
+            mapContainer = document.createElement('div');
+            mapContainer.id = 'sede-map';
+            mapContainer.style.height = '300px';
+            mapContainer.style.width = '100%';
+            mapContainer.style.marginBottom = '20px';
+            mapContainer.style.borderRadius = '12px';
+            mapContainer.style.border = '1px solid #dee2e6';
+            
+            // Insertar mapa antes de los campos de latitud y longitud
+            latField.closest('.mb-3').parentNode.insertBefore(mapContainer, latField.closest('.mb-3'));
+        }
+
+        // Lat/Lon inicial o por defecto (Perú aprox)
+        let initialLat = latField.value ? parseFloat(latField.value) : -12.046374;
+        let initialLon = lonField.value ? parseFloat(lonField.value) : -77.042793;
+
+        const map = L.map('sede-map').setView([initialLat, initialLon], 13);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        let marker = L.marker([initialLat, initialLon], {draggable: true}).addTo(map);
+
+        // Si es una sede nueva sin latitud, usar geolocalización real
+        if (!latField.value && navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((pos) => {
+                const lat = pos.coords.latitude;
+                const lon = pos.coords.longitude;
+                latField.value = lat.toFixed(6);
+                lonField.value = lon.toFixed(6);
+                map.setView([lat, lon], 15);
+                marker.setLatLng([lat, lon]);
+            });
+        }
+
+        // Actualizar campos al arrastrar el marcador
+        marker.on('dragend', function (e) {
+            const position = marker.getLatLng();
+            latField.value = position.lat.toFixed(6);
+            lonField.value = position.lng.toFixed(6);
+        });
+
+        // Actualizar marcador al hacer clic en el mapa
+        map.on('click', function(e) {
+            marker.setLatLng(e.latlng);
+            latField.value = e.latlng.lat.toFixed(6);
+            lonField.value = e.latlng.lng.toFixed(6);
+        });
+        
+        // Asegurar que los campos sigan siendo de sólo lectura
+        latField.setAttribute('readonly', 'readonly');
+        lonField.setAttribute('readonly', 'readonly');
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block title %}Crear Cuenta | Delivery NATIVO{% endblock %}
+
+{% block extra_js %}
+<style>
+    body { background: #f7f7f7; }
+    .auth-wrapper {
+        min-height: 85vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 30px 15px;
+    }
+    .auth-card {
+        background: #fff;
+        border-radius: 28px;
+        box-shadow: 0 25px 60px rgba(15,23,42,0.08);
+        overflow: hidden;
+        max-width: 500px;
+        width: 100%;
+    }
+    .auth-hero {
+        background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #dc2626 100%);
+        padding: 35px 35px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    .auth-hero::before {
+        content: '\f508'; font-family: 'Font Awesome 5 Free'; font-weight: 900;
+        position: absolute; right: -25px; bottom: -25px;
+        font-size: 9rem; color: rgba(255,255,255,0.05);
+    }
+    .auth-hero .brand-icon {
+        width: 72px; height: 72px; background: rgba(255,255,255,0.12);
+        border-radius: 20px; display: inline-flex; align-items: center;
+        justify-content: center; font-size: 2rem; color: white; margin-bottom: 16px;
+        backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.15);
+    }
+    .auth-hero h2 { color: #fff; font-weight: 800; font-size: 1.6rem; margin-bottom: 6px; }
+    .auth-hero p { color: rgba(255,255,255,0.8); font-size: 0.9rem; margin: 0; }
+    .auth-body { padding: 35px; }
+    .input-field {
+        border: 2px solid #f1f5f9;
+        border-radius: 14px;
+        padding: 14px 16px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        background: #f8fafc;
+        width: 100%;
+    }
+    .input-field:focus {
+        border-color: #dc2626;
+        background: #fff;
+        box-shadow: 0 0 0 4px rgba(220,38,38,0.08);
+        outline: none;
+    }
+    .field-label { font-weight: 700; font-size: 0.8rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: block; }
+
+    .rol-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .rol-card { position: relative; }
+    .rol-card input[type="radio"] { position: absolute; opacity: 0; }
+    .rol-card label {
+        display: flex; flex-direction: column; align-items: center;
+        padding: 14px 10px; border: 2px solid #f1f5f9; border-radius: 14px;
+        cursor: pointer; transition: all 0.2s; background: #f8fafc;
+        font-size: 0.8rem; font-weight: 700; color: #6b7280; gap: 8px;
+    }
+    .rol-card label .icon { font-size: 1.5rem; }
+    .rol-card input:checked + label {
+        border-color: #dc2626; background: #fff5f5; color: #dc2626;
+        box-shadow: 0 0 0 4px rgba(220,38,38,0.08);
+    }
+    .rol-card label:hover { border-color: #fca5a5; background: #fff; }
+
+    .btn-auth {
+        background: linear-gradient(135deg, #dc2626, #ef4444);
+        color: white; border: none; border-radius: 14px;
+        padding: 15px; font-weight: 700; font-size: 1rem;
+        width: 100%; transition: all 0.2s;
+        box-shadow: 0 4px 15px rgba(220,38,38,0.3);
+    }
+    .btn-auth:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(220,38,38,0.4); color: white; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="auth-hero">
+            <div class="brand-icon">
+                <i class="fas fa-user-plus"></i>
+            </div>
+            <h2>Únete a NATIVO</h2>
+            <p>La mejor plataforma de delivery local en tu ciudad</p>
+        </div>
+        <div class="auth-body">
+            <form method="POST" class="d-grid gap-4">
+                {% csrf_token %}
+
+                <div>
+                    <span class="field-label">Nombre de Usuario</span>
+                    <input type="text" name="username" class="input-field" placeholder="Ej: diego_dev" required>
+                </div>
+
+                <div>
+                    <span class="field-label">Correo Electrónico</span>
+                    <input type="email" name="email" class="input-field" placeholder="correo@ejemplo.com" required>
+                </div>
+
+                <div>
+                    <span class="field-label">Contraseña</span>
+                    <input type="password" name="password" class="input-field" placeholder="Crea una contraseña segura" required>
+                </div>
+
+                <div>
+                    <span class="field-label mb-3">¿Cómo quieres usar la plataforma?</span>
+                    <div class="rol-cards">
+                        <div class="rol-card">
+                            <input type="radio" name="rol" id="rol_cliente" value="cliente" required>
+                            <label for="rol_cliente">
+                                <span class="icon">🍔</span>
+                                Cliente
+                            </label>
+                        </div>
+                        <div class="rol-card">
+                            <input type="radio" name="rol" id="rol_negocio" value="negocio">
+                            <label for="rol_negocio">
+                                <span class="icon">🏪</span>
+                                Negocio
+                            </label>
+                        </div>
+                        <div class="rol-card">
+                            <input type="radio" name="rol" id="rol_repartidor" value="repartidor">
+                            <label for="rol_repartidor">
+                                <span class="icon">🛵</span>
+                                Repartidor
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-auth">
+                    <i class="fas fa-user-check me-2"></i>Crear mi cuenta gratis
+                </button>
+
+                <div class="text-center">
+                    <p class="mb-0 text-muted small">¿Ya tienes cuenta? <a href="{% url 'login' %}" class="text-danger fw-bold text-decoration-none">Inicia sesión</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

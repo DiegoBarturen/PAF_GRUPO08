@@ -1,0 +1,316 @@
+{% extends 'base.html' %}
+{% load l10n %}
+
+{% block title %}Configuración de Local | Delivery NATIVO{% endblock %}
+
+{% block extra_js %}
+<style>
+    /* Fondo limpio para vistas de configuración */
+    body { background-color: #f8f9fa; }
+    
+    .settings-header {
+        background: #fff;
+        padding: 30px 0;
+        border-bottom: 1px solid #e5e7eb;
+        margin-bottom: 40px;
+    }
+    
+    .settings-title {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #111;
+        margin: 0;
+    }
+    
+    .card-settings {
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        background: #fff;
+        overflow: hidden;
+    }
+    
+    /* Layout de dos columnas para configuraciones */
+    .settings-layout {
+        display: grid;
+        grid-template-columns: 1fr 2fr; /* 1 parte izquierda, 2 partes derecha */
+        gap: 3rem;
+    }
+    
+    @media (max-width: 768px) {
+        .settings-layout { grid-template-columns: 1fr; gap: 1.5rem; }
+    }
+    
+    .settings-sidebar h4 { font-weight: 800; color: #111; font-size: 1.2rem; margin-bottom: 15px; }
+    .settings-sidebar p { color: #6b7280; font-size: 0.95rem; line-height: 1.6; }
+    
+    /* Magia CSS para inyectarle estilos al formulario automático de Django */
+    .django-form p {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 1.5rem;
+    }
+    
+    .django-form label {
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+    
+    .django-form input[type="text"],
+    .django-form input[type="email"],
+    .django-form input[type="number"],
+    .django-form input[type="url"],
+    .django-form textarea,
+    .django-form select {
+        border: 1px solid #d1d5db;
+        border-radius: 0.5rem;
+        padding: 0.75rem 1rem;
+        background-color: #f9fafb;
+        font-size: 1rem;
+        color: #111827;
+        transition: all 0.2s;
+    }
+    
+    .django-form input[type="file"] {
+        padding: 10px; background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 0.75rem; cursor: pointer;
+        width: 100%;
+    }
+    .django-form input[type="file"]::file-selector-button {
+        background-color: #e11d48; color: white; border: none; padding: 8px 16px;
+        border-radius: 20px; font-weight: bold; cursor: pointer; margin-right: 15px;
+        transition: background 0.2s;
+    }
+    .django-form input[type="file"]::file-selector-button:hover {
+        background-color: #be123c;
+    }
+    
+    .django-form input:focus, 
+    .django-form textarea:focus,
+    .django-form select:focus {
+        border-color: #e11d48;
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(225, 29, 72, 0.1);
+        background-color: #fff;
+    }
+    
+    /* TRUCO AVANZADO: Convertir un checkbox normal en un Switch (Interruptor) */
+    .django-form input[type="checkbox"] {
+        appearance: none;
+        width: 50px;
+        height: 28px;
+        background-color: #d1d5db;
+        border-radius: 20px;
+        position: relative;
+        cursor: pointer;
+        outline: none;
+        transition: background-color 0.3s;
+        margin: 0;
+    }
+    
+    .django-form input[type="checkbox"]::after {
+        content: '';
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 24px;
+        height: 24px;
+        background-color: white;
+        border-radius: 50%;
+        transition: transform 0.3s;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .django-form input[type="checkbox"]:checked { background-color: #10b981; } /* Verde success */
+    .django-form input[type="checkbox"]:checked::after { transform: translateX(22px); }
+    
+    /* Estilizar el contenedor del checkbox (usando :has soportado en navegadores modernos) */
+    .django-form p:has(input[type="checkbox"]) {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        background: #f8fafc;
+        padding: 15px 20px;
+        border-radius: 0.75rem;
+        border: 1px solid #e2e8f0;
+    }
+    .django-form p:has(input[type="checkbox"]) label { margin: 0; font-size: 1rem; cursor: pointer;}
+    
+    /* Footer del formulario */
+    .form-footer {
+        background-color: #f9fafb;
+        padding: 20px 30px;
+        border-top: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: flex-end;
+        gap: 15px;
+    }
+</style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const latInput = document.getElementById('id_latitud');
+        const lonInput = document.getElementById('id_longitud');
+
+        if (latInput && lonInput) {
+            // 1. Crear el contenedor del mapa dinámicamente sobre la latitud
+            const latParagraph = latInput.closest('p');
+            if (latParagraph) {
+                const mapContainer = document.createElement('div');
+                mapContainer.className = 'mb-4';
+                
+                const mapLabel = document.createElement('label');
+                mapLabel.className = 'form-label fw-bold text-dark mb-2';
+                mapLabel.innerHTML = '<i class="fas fa-map-marked-alt text-danger me-2"></i>Ubicación en el Mapa <span class="text-muted fw-normal">(Haz clic en el mapa o arrastra el pin para fijar tu local)</span>';
+                
+                const mapDiv = document.createElement('div');
+                mapDiv.id = 'mapa-registro';
+                mapDiv.style.height = '350px';
+                mapDiv.style.marginBottom = '1.5rem';
+                mapDiv.style.borderRadius = '0.5rem';
+                mapDiv.style.border = '1px solid #d1d5db';
+                mapDiv.style.boxShadow = 'inset 0 2px 4px rgba(0,0,0,0.06)';
+                mapDiv.style.position = 'relative';
+                mapDiv.style.zIndex = '1';
+                
+                mapContainer.appendChild(mapLabel);
+                mapContainer.appendChild(mapDiv);
+                
+                latParagraph.parentNode.insertBefore(mapContainer, latParagraph);
+            }
+
+            // 2. Obtener valores iniciales o usar Lima, Perú por defecto
+            let lat = parseFloat("{{ form_sede.instance.latitud|unlocalize|default:'' }}");
+            let lon = parseFloat("{{ form_sede.instance.longitud|unlocalize|default:'' }}");
+            let hasCoords = true;
+
+            if (isNaN(lat) || isNaN(lon) || (Math.abs(lat) < 0.01 && Math.abs(lon) < 0.01)) {
+                lat = parseFloat(latInput.value.replace(',', '.'));
+                lon = parseFloat(lonInput.value.replace(',', '.'));
+            }
+
+            // Tratamos 0,0 o coordenadas extremadamente cercanas a cero como placeholders sin ubicación
+            if (isNaN(lat) || isNaN(lon) || (Math.abs(lat) < 0.01 && Math.abs(lon) < 0.01)) {
+                lat = -12.046374;
+                lon = -77.042793;
+                hasCoords = false;
+            }
+
+            // 3. Inicializar el mapa
+            const map = L.map('mapa-registro').setView([lat, lon], hasCoords ? 16 : 13);
+
+            // 4. Cargar OpenStreetMap tiles
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            // 5. Crear marcador
+            const marker = L.marker([lat, lon], {
+                draggable: true
+            }).addTo(map);
+
+            // Función para actualizar coordenadas
+            function actualizarCoordenadas(latVal, lonVal) {
+                latInput.value = Number(latVal).toFixed(6);
+                lonInput.value = Number(lonVal).toFixed(6);
+            }
+
+            // Si no tiene coordenadas iniciales, intentar usar GPS del navegador
+            if (!hasCoords && navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const userLat = position.coords.latitude;
+                        const userLon = position.coords.longitude;
+                        map.setView([userLat, userLon], 16);
+                        marker.setLatLng([userLat, userLon]);
+                        actualizarCoordenadas(userLat, userLon);
+                    },
+                    (error) => {
+                        console.log("Error al obtener GPS:", error.message);
+                    }
+                );
+            }
+
+            // Escuchar arrastre del marcador
+            marker.on('dragend', function () {
+                const position = marker.getLatLng();
+                actualizarCoordenadas(position.lat, position.lng);
+            });
+
+            // Escuchar clic en el mapa
+            map.on('click', function (e) {
+                marker.setLatLng(e.latlng);
+                actualizarCoordenadas(e.latlng.lat, e.latlng.lng);
+            });
+        }
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+<!-- Cabecera Ancha Fuera de la Tarjeta -->
+<div class="settings-header">
+    <div class="container">
+        <h1 class="settings-title">
+            {% if existe %}Configuración del Local{% else %}Registrar Nuevo Local{% endif %}
+        </h1>
+        <p class="text-muted mt-2 mb-0">Gestiona la información pública de tu establecimiento y tus preferencias operativas.</p>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="settings-layout">
+        
+        <!-- Columna Izquierda: Instrucciones estáticas -->
+        <div class="settings-sidebar">
+            <h4>Perfil Público</h4>
+            <p>Esta información será visible para todos los clientes y repartidores en la aplicación. Asegúrate de usar un nombre comercial claro y una dirección exacta.</p>
+            
+            <div class="mt-4 p-4 bg-white rounded-4 border shadow-sm">
+                <h6 class="fw-bold text-dark"><i class="fas fa-lightbulb text-warning me-2"></i> Consejos de éxito</h6>
+                <ul class="text-muted small ps-3 mt-3 mb-0" style="line-height: 1.7;">
+                    <li>Mantén tu dirección actualizada para evitar problemas con los repartidores.</li>
+                    <li>Las descripciones atractivas y detalladas aumentan las ventas.</li>
+                    <li><strong>¿Emergencia en cocina?</strong> Usa el interruptor de disponibilidad a la derecha para cerrar temporalmente tu local y no recibir pedidos.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Columna Derecha: El Formulario Funcional -->
+        <div class="card-settings">
+            <!-- Recuerda incluir enctype="multipart/form-data" si en el futuro agregas fotos a este modelo -->
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <!-- Cuerpo del Formulario -->
+                <div class="p-4 p-md-5">
+                    <h5 class="fw-bold text-dark mb-4 border-bottom pb-3">Detalles del Negocio</h5>
+                    
+                    <div class="django-form">
+                        <!-- Django inyectará los inputs aquí -->
+                        {{ form.as_p }}
+                        
+                        <h5 class="fw-bold text-dark mt-4 mb-4 border-bottom pb-3">Detalles de la Sede Principal</h5>
+                        {{ form_sede.as_p }}
+                    </div>
+                </div>
+                
+                <!-- Footer fijo con fondo gris -->
+                <div class="form-footer">
+                    {% if existe %}
+                    <a href="{% url 'pedidos:panel_negocio' %}" class="btn btn-light border fw-bold px-4 rounded-pill text-dark">
+                        Cancelar
+                    </a>
+                    {% endif %}
+                    <button type="submit" class="btn btn-danger fw-bold px-4 rounded-pill shadow-sm">
+                        <i class="fas fa-save me-2"></i> {% if existe %}Guardar Cambios{% else %}Crear Negocio{% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+    </div>
+</div>
+{% endblock %}

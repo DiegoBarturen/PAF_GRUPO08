@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block title %}Seleccionar Sede | Delivery NATIVO{% endblock %}
+
+{% block extra_js %}
+<style>
+    body { background: #f7f7f7; }
+    .sel-wrapper {
+        min-height: 85vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 30px 15px;
+    }
+    .sel-card {
+        background: #fff;
+        border-radius: 28px;
+        box-shadow: 0 25px 60px rgba(15,23,42,0.08);
+        overflow: hidden;
+        max-width: 560px;
+        width: 100%;
+    }
+    .sel-hero {
+        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        padding: 35px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    .sel-hero::before {
+        content: '\f54f'; font-family: 'Font Awesome 5 Free'; font-weight: 900;
+        position: absolute; right: -20px; bottom: -25px;
+        font-size: 9rem; color: rgba(255,255,255,0.07);
+    }
+    .sel-hero .icon-wrap {
+        width: 72px; height: 72px; background: rgba(255,255,255,0.15);
+        border-radius: 20px; display: inline-flex; align-items: center;
+        justify-content: center; font-size: 2rem; color: white; margin-bottom: 16px;
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+    .sel-hero h2 { color: #fff; font-weight: 800; font-size: 1.5rem; margin-bottom: 6px; }
+    .sel-hero p { color: rgba(255,255,255,0.85); font-size: 0.9rem; margin: 0; }
+    .sel-body { padding: 30px; }
+
+    .sede-card {
+        border: 2px solid #f1f5f9;
+        border-radius: 16px;
+        padding: 18px 20px;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: #f8fafc;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 12px;
+        position: relative;
+    }
+    .sede-card:hover { border-color: #fca5a5; background: #fff; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(220,38,38,0.08); }
+    .sede-card.selected { border-color: #dc2626; background: #fff5f5; box-shadow: 0 0 0 4px rgba(220,38,38,0.1); }
+    .sede-icon {
+        width: 50px; height: 50px; background: #fee2e2; border-radius: 14px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.4rem; flex-shrink: 0;
+    }
+    .sede-card.selected .sede-icon { background: #dc2626; color: white; }
+    .sede-name { font-weight: 700; font-size: 1rem; color: #111; margin-bottom: 2px; }
+    .sede-negocio { font-size: 0.82rem; color: #6b7280; }
+    .check-icon {
+        position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+        width: 24px; height: 24px; border-radius: 50%; background: #dc2626;
+        display: flex; align-items: center; justify-content: center;
+        color: white; font-size: 0.75rem; opacity: 0; transition: opacity 0.2s;
+    }
+    .sede-card.selected .check-icon { opacity: 1; }
+    .btn-ingresar {
+        background: linear-gradient(135deg, #dc2626, #ef4444);
+        color: white; border: none; border-radius: 14px;
+        padding: 15px; font-weight: 700; font-size: 1rem;
+        width: 100%; transition: all 0.2s;
+        box-shadow: 0 4px 15px rgba(220,38,38,0.3);
+    }
+    .btn-ingresar:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(220,38,38,0.4); color: white; }
+    .btn-ingresar:disabled { opacity: 0.5; transform: none; cursor: not-allowed; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="sel-wrapper">
+    <div class="sel-card">
+        <div class="sel-hero">
+            <div class="icon-wrap"><i class="fas fa-store"></i></div>
+            <h2>Selecciona tu Sede</h2>
+            <p>¿Con cuál sede trabajarás hoy?</p>
+        </div>
+        <div class="sel-body">
+            <form method="POST" id="sede-form">
+                {% csrf_token %}
+                <input type="hidden" name="sede_id" id="selected-sede-id">
+
+                <div class="mb-4">
+                    {% for sede in sedes %}
+                    <div class="sede-card" onclick="selectSede(this, '{{ sede.id }}')" id="sede-card-{{ sede.id }}">
+                        <div class="sede-icon">🏪</div>
+                        <div>
+                            <div class="sede-name">{{ sede.nombre }}</div>
+                            <div class="sede-negocio"><i class="fas fa-briefcase me-1"></i>{{ sede.negocio.nombre_comercial }}</div>
+                        </div>
+                        <div class="check-icon"><i class="fas fa-check"></i></div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <button type="submit" class="btn-ingresar" id="btn-ingresar" disabled>
+                    <i class="fas fa-sign-in-alt me-2"></i>Ingresar al Panel
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function selectSede(card, sedeId) {
+        document.querySelectorAll('.sede-card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        document.getElementById('selected-sede-id').value = sedeId;
+        document.getElementById('btn-ingresar').disabled = false;
+    }
+</script>
+{% endblock %}

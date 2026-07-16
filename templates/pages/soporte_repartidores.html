@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Soporte para Repartidores | Delivery NATIVO{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 text-center mb-5">
+            <h1 class="fw-bold text-dark mb-3">Centro de Ayuda para Repartidores</h1>
+            <p class="text-muted">Tu seguridad y eficiencia son nuestra prioridad.</p>
+        </div>
+    </div>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 h-100 p-4">
+                <h5 class="fw-bold text-danger"><i class="fas fa-shield-alt me-2"></i>Seguridad</h5>
+                <p class="text-muted small">Recuerda siempre llevar tu casco, respetar las señales de tránsito y utilizar nuestra línea de emergencia en caso de accidente.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 h-100 p-4">
+                <h5 class="fw-bold text-danger"><i class="fas fa-wallet me-2"></i>Pagos</h5>
+                <p class="text-muted small">Los cortes de pago se realizan todos los lunes. Si tienes discrepancias, usa el botón de soporte financiero en tu app.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 h-100 p-4">
+                <h5 class="fw-bold text-danger"><i class="fas fa-question-circle me-2"></i>Dudas Frecuentes</h5>
+                <p class="text-muted small">Revisa cómo cancelar un pedido problemático, qué hacer si el cliente no responde y cómo manejar devoluciones.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

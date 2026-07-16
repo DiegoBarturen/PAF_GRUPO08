@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block title %}Iniciar Sesión | Delivery NATIVO{% endblock %}
+
+{% block extra_js %}
+<style>
+    body { background: #f7f7f7; }
+    .auth-wrapper {
+        min-height: 85vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 30px 15px;
+    }
+    .auth-card {
+        background: #fff;
+        border-radius: 28px;
+        box-shadow: 0 25px 60px rgba(15,23,42,0.08);
+        overflow: hidden;
+        max-width: 480px;
+        width: 100%;
+    }
+    .auth-hero {
+        background: linear-gradient(135deg, #dc2626 0%, #ef4444 50%, #f97316 100%);
+        padding: 40px 35px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    .auth-hero::before {
+        content: '\f21a'; font-family: 'Font Awesome 5 Free'; font-weight: 900;
+        position: absolute; right: -20px; bottom: -30px;
+        font-size: 9rem; color: rgba(255,255,255,0.07);
+    }
+    .auth-hero .brand-icon {
+        width: 72px; height: 72px; background: rgba(255,255,255,0.15);
+        border-radius: 20px; display: inline-flex; align-items: center;
+        justify-content: center; font-size: 2rem; color: white; margin-bottom: 16px;
+        backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2);
+    }
+    .auth-hero h2 { color: #fff; font-weight: 800; font-size: 1.6rem; margin-bottom: 6px; }
+    .auth-hero p { color: rgba(255,255,255,0.85); font-size: 0.95rem; margin: 0; }
+    .auth-body { padding: 35px; }
+    .input-field {
+        border: 2px solid #f1f5f9;
+        border-radius: 14px;
+        padding: 14px 16px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        background: #f8fafc;
+    }
+    .input-field:focus {
+        border-color: #dc2626;
+        background: #fff;
+        box-shadow: 0 0 0 4px rgba(220,38,38,0.08);
+        outline: none;
+    }
+    .input-group-text-custom {
+        background: #f8fafc; border: 2px solid #f1f5f9;
+        border-right: none; border-radius: 14px 0 0 14px;
+        padding: 14px 15px; color: #9ca3af;
+    }
+    .input-group .input-field { border-radius: 0 14px 14px 0; border-left: none; }
+    .input-group:focus-within .input-group-text-custom {
+        border-color: #dc2626; background: #fff; color: #dc2626;
+    }
+    .btn-auth {
+        background: linear-gradient(135deg, #dc2626, #ef4444);
+        color: white; border: none; border-radius: 14px;
+        padding: 15px; font-weight: 700; font-size: 1rem;
+        width: 100%; transition: all 0.2s;
+        box-shadow: 0 4px 15px rgba(220,38,38,0.3);
+    }
+    .btn-auth:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(220,38,38,0.4); color: white; }
+    .field-label { font-weight: 700; font-size: 0.8rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #f1f5f9; }
+    .divider span { color: #9ca3af; font-size: 0.8rem; font-weight: 600; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="auth-hero">
+            <div class="brand-icon">
+                <i class="fas fa-motorcycle"></i>
+            </div>
+            <h2>¡Bienvenido de vuelta!</h2>
+            <p>Ingresa tus datos para continuar en Delivery NATIVO</p>
+        </div>
+        <div class="auth-body">
+            <div class="mb-4">
+                <div class="field-label">Usuario</div>
+                <div class="input-group">
+                    <span class="input-group-text-custom"><i class="fas fa-user"></i></span>
+                    <input type="text" name="username" form="login-form" class="input-field form-control" placeholder="Tu nombre de usuario" required>
+                </div>
+            </div>
+            <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="field-label">Contraseña</div>
+                    <a href="{% url 'reset_password' %}" class="text-decoration-none small text-danger fw-bold">¿Olvidaste tu contraseña?</a>
+                </div>
+                <div class="input-group">
+                    <span class="input-group-text-custom"><i class="fas fa-lock"></i></span>
+                    <input type="password" name="password" form="login-form" class="input-field form-control" placeholder="••••••••" required>
+                </div>
+            </div>
+
+            <form method="POST" id="login-form" class="mt-4">
+                {% csrf_token %}
+                <button type="submit" class="btn-auth">
+                    <i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesión
+                </button>
+            </form>
+
+            <div class="divider"><span>o</span></div>
+
+            <div class="text-center">
+                <p class="mb-0 text-muted small">¿No tienes cuenta? <a href="{% url 'registro' %}" class="text-danger fw-bold text-decoration-none">Regístrate gratis</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

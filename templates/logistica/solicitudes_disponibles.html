@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% load l10n %}
+
+{% block title %}Solicitudes Disponibles | Delivery NATIVO{% endblock %}
+
+{% block content %}
+<style>
+    .solicitud-card {
+        border: 0;
+        border-radius: 24px;
+        box-shadow: 0 14px 34px rgba(31, 41, 55, 0.07);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        background: linear-gradient(180deg, #ffffff 0%, #fff9f7 100%);
+        overflow: hidden;
+    }
+    .solicitud-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 18px 42px rgba(31, 41, 55, 0.12);
+    }
+    .section-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        font-size: 0.8rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #b45309;
+        background: #fff3e9;
+        border-radius: 999px;
+        padding: 0.45rem 0.8rem;
+        font-weight: 700;
+    }
+    .costo-badge {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: #198754;
+        background: #d1e7dd;
+        padding: 0.4rem 0.8rem;
+        border-radius: 12px;
+    }
+    .hero-bg {
+        background: linear-gradient(135deg, #fff5f1 0%, #ffffff 54%, #ffe7df 100%);
+        border: 1px solid rgba(220, 53, 69, 0.08);
+        border-radius: 26px;
+        box-shadow: 0 18px 42px rgba(31, 41, 55, 0.07);
+    }
+</style>
+
+<div class="row justify-content-center">
+    <div class="col-xl-10">
+        <div class="hero-bg p-4 p-lg-5 mb-4">
+            {% include 'logistica/_nav_repartidor.html' %}
+            
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                <div>
+                    <h2 class="fw-bold text-dark mb-1">Solicitudes Disponibles</h2>
+                    <p class="text-muted mb-0">Revisa los pedidos listos para recojo y acepta el que más te convenga.</p>
+                </div>
+            </div>
+        </div>
+
+        {% if solicitudes %}
+        <div class="row">
+            {% for solicitud in solicitudes %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card solicitud-card h-100">
+                    <div class="card-body p-4 d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <span class="section-chip"><i class="fas fa-store"></i> {{ solicitud.sede.nombre_comercial }}</span>
+                            <span class="costo-badge">S/ {{ solicitud.costo_envio|floatformat:2 }}</span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <h5 class="fw-bold mb-1"><i class="fas fa-map-marker-alt text-danger me-2"></i>Origen (Sede)</h5>
+                            <p class="text-muted mb-0 ps-4 small">{{ solicitud.sede.direccion|default:"Sin dirección" }}</p>
+                        </div>
+                        
+                        <div class="mb-4 flex-grow-1">
+                            <h5 class="fw-bold mb-1"><i class="fas fa-flag-checkered text-success me-2"></i>Destino (Cliente)</h5>
+                            <p class="text-muted mb-0 ps-4 small">{{ solicitud.direccion_entrega }}</p>
+                            {% if solicitud.referencia_entrega %}
+                            <p class="text-muted mb-0 ps-4 small fst-italic">Ref: {{ solicitud.referencia_entrega }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <form method="POST" action="{% url 'logistica:aceptar_solicitud' solicitud.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger w-100 fw-bold py-2 rounded-pill shadow-sm">
+                                <i class="fas fa-check-circle me-2"></i>Aceptar Solicitud
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="card border-0 shadow-sm rounded-4 text-center py-5">
+            <div class="card-body">
+                <i class="fas fa-inbox text-muted mb-3" style="font-size: 3rem; opacity: 0.5;"></i>
+                <h4 class="fw-bold text-dark">No hay solicitudes disponibles</h4>
+                <p class="text-muted mb-0">Actualmente no hay pedidos listos para recojo. Vuelve a revisar en unos minutos.</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

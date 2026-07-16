@@ -1,0 +1,1072 @@
+{% extends 'base.html' %}
+
+{% block title %}Mi Perfil | Delivery NATIVO{% endblock %}
+
+{% block content %}
+<style>
+    .perfil-hero {
+        background: linear-gradient(135deg, #fff4ef 0%, #ffffff 55%, #ffe3d8 100%);
+        border: 1px solid rgba(220, 53, 69, 0.08);
+        border-radius: 24px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .perfil-hero::after {
+        content: "";
+        position: absolute;
+        top: -40px;
+        right: -40px;
+        width: 180px;
+        height: 180px;
+        background: radial-gradient(circle, rgba(220, 53, 69, 0.18) 0%, rgba(220, 53, 69, 0) 70%);
+        pointer-events: none;
+    }
+
+    .perfil-panel,
+    .metric-card,
+    .gps-card {
+        border: 0;
+        border-radius: 22px;
+        box-shadow: 0 14px 35px rgba(31, 41, 55, 0.08);
+    }
+
+    .perfil-badge {
+        background: #1f2937;
+        color: #fff;
+        border-radius: 999px;
+        padding: 0.55rem 1rem;
+        font-weight: 700;
+        font-size: 0.95rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+    }
+
+    .perfil-avatar {
+        width: 84px;
+        height: 84px;
+        border-radius: 22px;
+        background: linear-gradient(135deg, #dc3545 0%, #ff7a59 100%);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        box-shadow: 0 12px 30px rgba(220, 53, 69, 0.28);
+    }
+
+    .perfil-info-item,
+    .gps-data-item {
+        background: #fff8f5;
+        border: 1px solid rgba(220, 53, 69, 0.08);
+        border-radius: 18px;
+        padding: 0.95rem 1rem;
+    }
+
+    .perfil-info-label {
+        display: block;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #9a6b62;
+        margin-bottom: 0.2rem;
+    }
+
+    .metric-card,
+    .gps-card {
+        background: linear-gradient(180deg, #ffffff 0%, #fff8f5 100%);
+    }
+
+    .metric-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(220, 53, 69, 0.12);
+        color: #dc3545;
+        font-size: 1.2rem;
+    }
+
+    .metric-value {
+        font-size: 2.3rem;
+        line-height: 1;
+        font-weight: 800;
+        color: #1f2937;
+    }
+
+    .metric-muted {
+        color: #6c757d;
+        font-size: 0.92rem;
+    }
+
+    .status-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: #22c55e;
+        display: inline-block;
+    }
+
+    .gps-status {
+        min-height: 24px;
+    }
+
+    .estado-warning {
+        border-radius: 18px;
+        border: 1px solid rgba(180, 83, 9, 0.18);
+        background: #fff8e8;
+        color: #8a5a00;
+        padding: 0.9rem 1rem;
+        font-size: 0.92rem;
+    }
+
+    .estado-warning.info {
+        background: #eff6ff;
+        border-color: rgba(59, 130, 246, 0.18);
+        color: #1d4ed8;
+    }
+
+    .ayuda-operativa {
+        border: 1px solid rgba(31, 41, 55, 0.08);
+        border-radius: 20px;
+        background: linear-gradient(180deg, #fffdfa 0%, #fff6f1 100%);
+        padding: 1rem 1.1rem;
+    }
+
+    .ayuda-operativa-title {
+        font-size: 0.8rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #9a6b62;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+    }
+
+    .gps-card {
+        transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    }
+
+    .gps-card.gps-live {
+        background: linear-gradient(180deg, #f4fff7 0%, #ffffff 100%);
+        box-shadow: 0 18px 38px rgba(34, 197, 94, 0.10);
+    }
+
+    .gps-card.gps-paused {
+        background: linear-gradient(180deg, #fff7f2 0%, #ffffff 100%);
+        box-shadow: 0 18px 38px rgba(107, 114, 128, 0.10);
+    }
+
+    .gps-mode-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        border-radius: 999px;
+        padding: 0.6rem 0.95rem;
+        font-size: 0.9rem;
+        font-weight: 700;
+        background: #ecfdf3;
+        color: #166534;
+        border: 1px solid rgba(34, 197, 94, 0.18);
+    }
+
+    .gps-mode-pill.paused {
+        background: #fff1f2;
+        color: #9f1239;
+        border-color: rgba(244, 63, 94, 0.18);
+    }
+
+    .gps-mode-pill.waiting {
+        background: #fff7ed;
+        color: #9a3412;
+        border-color: rgba(249, 115, 22, 0.18);
+    }
+
+    .gps-highlight {
+        border-radius: 18px;
+        padding: 0.95rem 1rem;
+        background: #ecfdf3;
+        border: 1px solid rgba(34, 197, 94, 0.14);
+        color: #166534;
+    }
+
+    .gps-highlight.paused {
+        background: #fff1f2;
+        border-color: rgba(244, 63, 94, 0.14);
+        color: #9f1239;
+    }
+
+    .gps-highlight.waiting {
+        background: #fff7ed;
+        border-color: rgba(249, 115, 22, 0.14);
+        color: #9a3412;
+    }
+
+    .confirm-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.48);
+        backdrop-filter: blur(6px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+        z-index: 1055;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.18s ease;
+    }
+
+    .confirm-overlay.visible {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .confirm-dialog {
+        width: min(100%, 460px);
+        border-radius: 28px;
+        background: linear-gradient(180deg, #fffdfb 0%, #fff3ee 100%);
+        box-shadow: 0 28px 60px rgba(15, 23, 42, 0.28);
+        border: 1px solid rgba(220, 53, 69, 0.12);
+        overflow: hidden;
+        transform: translateY(10px) scale(0.98);
+        transition: transform 0.18s ease;
+    }
+
+    .confirm-overlay.visible .confirm-dialog {
+        transform: translateY(0) scale(1);
+    }
+
+    .confirm-topbar {
+        height: 8px;
+        background: linear-gradient(90deg, #dc3545 0%, #ff7a59 100%);
+    }
+
+    .confirm-body {
+        padding: 1.4rem 1.4rem 1.25rem;
+    }
+
+    .confirm-icon {
+        width: 58px;
+        height: 58px;
+        border-radius: 18px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(220, 53, 69, 0.12);
+        color: #dc3545;
+        font-size: 1.35rem;
+        box-shadow: inset 0 0 0 1px rgba(220, 53, 69, 0.08);
+        margin-bottom: 1rem;
+    }
+
+    .confirm-title {
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+
+    .confirm-text {
+        color: #5b5563;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+
+    .confirm-note {
+        border-radius: 18px;
+        background: #fff8e8;
+        border: 1px solid rgba(180, 83, 9, 0.16);
+        color: #8a5a00;
+        padding: 0.9rem 1rem;
+        font-size: 0.92rem;
+    }
+
+    .confirm-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+        margin-top: 1.15rem;
+    }
+
+    .confirm-actions .btn {
+        min-width: 128px;
+        border-radius: 14px;
+        font-weight: 700;
+        padding: 0.78rem 1rem;
+    }
+</style>
+
+<div class="row justify-content-center">
+    <div class="col-xl-10">
+        <div class="perfil-hero p-4 p-lg-5 mb-4">
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-4">
+                <div class="d-flex align-items-center gap-4">
+                    <div class="perfil-avatar">
+                        <i class="fas fa-motorcycle"></i>
+                    </div>
+                    <div>
+                        <p class="text-danger fw-semibold mb-2 text-uppercase small">Centro Operativo</p>
+                        <h1 class="display-6 fw-bold mb-2">Perfil del Repartidor</h1>
+                        <p class="text-muted mb-0">Administra tus datos operativos y comparte tu ubicación real desde el navegador.</p>
+                    </div>
+                </div>
+                {% if perfil_repartidor %}
+                <span class="perfil-badge" id="badge-estado-actual">
+                    <i class="fas fa-signal"></i>{{ perfil_repartidor.get_estado_actual_display }}
+                </span>
+                {% endif %}
+            </div>
+        </div>
+
+        {% include 'logistica/_nav_repartidor.html' %}
+
+        {% if acceso_denegado %}
+        <div class="card perfil-panel">
+            <div class="card-body p-5 text-center">
+                <i class="fas fa-user-shield fa-3x text-danger mb-3"></i>
+                <h2 class="h4 fw-bold">Acceso solo para repartidores</h2>
+                <p class="text-muted mb-0">Esta sección pertenece al panel operativo del motorizado.</p>
+            </div>
+        </div>
+        {% else %}
+        <div class="row g-4">
+            <div class="col-lg-5">
+                <div class="card perfil-panel h-100">
+                    <div class="card-body p-4 p-lg-5">
+                        <div class="d-flex align-items-center justify-content-between mb-4">
+                            <div>
+                                <p class="text-muted text-uppercase small fw-semibold mb-1">Ficha Operativa</p>
+                                <h2 class="h4 fw-bold mb-0">{{ request.user.username }}</h2>
+                            </div>
+                            <span class="badge text-bg-danger rounded-pill px-3 py-2">Repartidor</span>
+                        </div>
+
+                        <form id="perfil-operativo-form" class="d-grid gap-3">
+                            <div class="perfil-info-item">
+                                <label for="estado-actual-input" class="perfil-info-label">Disponibilidad operativa</label>
+                                <select id="estado-actual-input" class="form-select border-0 bg-transparent fw-semibold" {% if perfil_repartidor.estado_actual == 'en_ruta' %}disabled{% endif %}>
+                                    {% if perfil_repartidor.estado_actual == 'en_ruta' %}
+                                    <option value="en_ruta" selected>En ruta (automatico)</option>
+                                    {% endif %}
+                                    <option value="disponible" {% if perfil_repartidor.estado_actual == 'disponible' %}selected{% endif %}>Disponible</option>
+                                    <option value="inactivo" {% if perfil_repartidor.estado_actual == 'inactivo' %}selected{% endif %}>Inactivo</option>
+                                </select>
+                                <div class="small text-muted mt-2">En ruta se actualiza automaticamente.</div>
+                            </div>
+
+                            <div id="estado-warning" class="estado-warning d-none">
+                                <span id="estado-warning-text"></span>
+                            </div>
+
+                            <div class="perfil-info-item">
+                                <label for="vehiculo-input" class="perfil-info-label">Vehículo</label>
+                                <input id="vehiculo-input" type="text" class="form-control border-0 bg-transparent fw-semibold px-0" value="{{ perfil_repartidor.vehiculo|default:'' }}" placeholder="Ej. Moto lineal">
+                            </div>
+
+                            <div class="ayuda-operativa">
+                                <div class="ayuda-operativa-title">Ayuda operativa</div>
+                                <div class="small text-muted">
+                                    <strong>Disponible:</strong> listo para trabajar y compartir ubicacion.
+                                </div>
+                                <div class="small text-muted mt-2">
+                                    <strong>Inactivo:</strong> pausa tu operacion y detiene el seguimiento de ubicacion.
+                                </div>
+                                <div class="small text-muted mt-2">
+                                    <strong>En ruta:</strong> se activa automaticamente al confirmar el recojo y vuelve a disponible al confirmar la entrega.
+                                </div>
+                            </div>
+
+                            <div class="d-flex flex-column flex-sm-row gap-2">
+                                <button type="submit" id="guardar-perfil-btn" class="btn btn-danger fw-bold px-4">
+                                    <i class="fas fa-save me-2"></i>Guardar perfil
+                                </button>
+                            </div>
+
+                            <div id="perfil-form-status" class="small"></div>
+                        </form>
+
+                        <div class="mt-4 p-3 rounded-4" style="background:#1f2937; color:#f9fafb;">
+                            <div class="small text-uppercase opacity-75 mb-1">Pedido activo</div>
+                            <div class="h4 fw-bold mb-1">
+                                {% if pedido_activo %}#{{ pedido_activo.id }}{% else %}Sin asignación{% endif %}
+                            </div>
+                            <div class="small opacity-75">Tu próxima acción operativa aparecerá en el panel principal del repartidor.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-7">
+                <div class="row g-4">
+                    <div class="col-12">
+                        <div class="card gps-card" id="gps-card">
+                            <div class="card-body p-4">
+                                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+                                    <div>
+                                        <div class="metric-muted">Ubicación en tiempo real</div>
+                                        <h2 class="h4 fw-bold mb-1">Geolocalización del repartidor</h2>
+                                        <p class="text-muted mb-0">Tu ubicación se actualizará automáticamente cuando permitas el acceso al GPS del navegador y tu disponibilidad esté en modo disponible.</p>
+                                    </div>
+                                    <div class="d-flex flex-column align-items-md-end gap-2">
+                                        <div class="gps-mode-pill" id="gps-mode-pill">
+                                            <span class="status-dot" id="gps-dot"></span>
+                                            <span id="gps-mode-label">Listo para compartir ubicación</span>
+                                        </div>
+                                        <button type="button" class="btn btn-outline-danger btn-sm fw-semibold d-none" id="activar-gps-btn">
+                                            <i class="fas fa-location-arrow me-2"></i>Activar ubicación
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="gps-data-item">
+                                            <span class="perfil-info-label">Latitud</span>
+                                            <strong id="latitud-valor">{{ perfil_repartidor.latitud|default:"Sin ubicación" }}</strong>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="gps-data-item">
+                                            <span class="perfil-info-label">Longitud</span>
+                                            <strong id="longitud-valor">{{ perfil_repartidor.longitud|default:"Sin ubicación" }}</strong>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="gps-data-item">
+                                            <span class="perfil-info-label">Última actualización</span>
+                                            <strong id="ultima-actualizacion-valor">{{ perfil_repartidor.ultima_actualizacion_ubicacion|date:"d/m/Y H:i:s"|default:"Aún no registrada" }}</strong>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="gps-status" class="gps-status gps-highlight waiting mt-3 small">Aún no se ha solicitado tu ubicación actual.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card metric-card h-100">
+                            <div class="card-body p-4">
+                                <div class="d-flex justify-content-between align-items-start mb-4">
+                                    <div>
+                                        <div class="metric-muted">Asignaciones Totales</div>
+                                        <div class="metric-value mt-2">{{ total_asignaciones }}</div>
+                                    </div>
+                                    <span class="metric-icon"><i class="fas fa-clipboard-list"></i></span>
+                                </div>
+                                <p class="text-muted mb-0 small">Cantidad acumulada de pedidos que pasaron por tu flujo logístico.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card metric-card h-100">
+                            <div class="card-body p-4">
+                                <div class="d-flex justify-content-between align-items-start mb-4">
+                                    <div>
+                                        <div class="metric-muted">Entregas Completadas</div>
+                                        <div class="metric-value mt-2">{{ total_entregas_completadas }}</div>
+                                    </div>
+                                    <span class="metric-icon"><i class="fas fa-check-circle"></i></span>
+                                </div>
+                                <p class="text-muted mb-0 small">Pedidos marcados como entregados satisfactoriamente.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card metric-card h-100">
+                            <div class="card-body p-4">
+                                <div class="d-flex justify-content-between align-items-start mb-4">
+                                    <div>
+                                        <div class="metric-muted">Eventos Registrados</div>
+                                        <div class="metric-value mt-2">{{ total_eventos }}</div>
+                                    </div>
+                                    <span class="metric-icon"><i class="fas fa-wave-square"></i></span>
+                                </div>
+                                <p class="text-muted mb-0 small">Eventos logísticos acumulados en tu historial operativo.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card metric-card h-100">
+                            <div class="card-body p-4">
+                                <div class="d-flex justify-content-between align-items-start mb-4">
+                                    <div>
+                                        <div class="metric-muted">Disponibilidad Actual</div>
+                                        <div class="metric-value mt-2" id="disponibilidad-valor">
+                                            {% if pedido_activo %}Ocupado{% else %}Libre{% endif %}
+                                        </div>
+                                    </div>
+                                    <span class="metric-icon"><i class="fas fa-route"></i></span>
+                                </div>
+                                <p class="text-muted mb-0 small">Lectura rápida de si tienes una entrega asignada en este momento.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card metric-card h-100">
+                            <div class="card-body p-4">
+                                <div class="d-flex justify-content-between align-items-start mb-4">
+                                    <div>
+                                        <div class="metric-muted">Ganancias por Envíos</div>
+                                        <div class="metric-value mt-2 text-success">S/ {{ total_ganancias|floatformat:2 }}</div>
+                                    </div>
+                                    <span class="metric-icon bg-success bg-opacity-10 text-success"><i class="fas fa-hand-holding-usd"></i></span>
+                                </div>
+                                <p class="text-muted mb-0 small">Tus ingresos generados por los costos de envío de tus entregas completadas.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="confirm-overlay" id="confirm-overlay" aria-hidden="true">
+    <div class="confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+        <div class="confirm-topbar"></div>
+        <div class="confirm-body">
+            <div class="confirm-icon">
+                <i class="fas fa-route"></i>
+            </div>
+            <div class="confirm-title" id="confirm-title">Confirmar cambio operativo</div>
+            <div class="confirm-text" id="confirm-text"></div>
+            <div class="confirm-note" id="confirm-note"></div>
+            <div class="confirm-actions">
+                <button type="button" class="btn btn-outline-secondary" id="confirm-cancel-btn">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirm-accept-btn">Aceptar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if user.is_authenticated and user.rol == 'repartidor' %}
+<script>
+    (function () {
+        const csrfToken = "{{ csrf_token }}";
+        const perfilUrl = "{% url 'logistica:mi_perfil_api' %}";
+        const ubicacionUrl = "{% url 'logistica:actualizar_ubicacion_repartidor' user.id %}";
+        const form = document.getElementById("perfil-operativo-form");
+        const estadoInput = document.getElementById("estado-actual-input");
+        const vehiculoInput = document.getElementById("vehiculo-input");
+        const formStatus = document.getElementById("perfil-form-status");
+        const saveButton = document.getElementById("guardar-perfil-btn");
+        const estadoWarning = document.getElementById("estado-warning");
+        const estadoWarningText = document.getElementById("estado-warning-text");
+        const gpsCard = document.getElementById("gps-card");
+        const gpsStatus = document.getElementById("gps-status");
+        const gpsDot = document.getElementById("gps-dot");
+        const gpsModePill = document.getElementById("gps-mode-pill");
+        const gpsModeLabel = document.getElementById("gps-mode-label");
+        const activarGpsBtn = document.getElementById("activar-gps-btn");
+        const latitudValor = document.getElementById("latitud-valor");
+        const longitudValor = document.getElementById("longitud-valor");
+        const ultimaActualizacionValor = document.getElementById("ultima-actualizacion-valor");
+        const badgeEstadoActual = document.getElementById("badge-estado-actual");
+        const confirmOverlay = document.getElementById("confirm-overlay");
+        const confirmText = document.getElementById("confirm-text");
+        const confirmNote = document.getElementById("confirm-note");
+        const confirmAcceptBtn = document.getElementById("confirm-accept-btn");
+        const confirmCancelBtn = document.getElementById("confirm-cancel-btn");
+        let ultimoEstadoGuardado = estadoInput ? estadoInput.value : null;
+        let ultimoEstadoConfirmado = estadoInput ? estadoInput.value : null;
+        let restaurarTextoBotonTimeout = null;
+        let watchId = null;
+        let estadoPermisoUbicacion = "unknown";
+
+        function setFormStatus(message, type = "muted") {
+            if (!formStatus) return;
+            formStatus.className = `small text-${type}`;
+            formStatus.textContent = message;
+        }
+
+        function setGpsStatus(message, type = "muted") {
+            if (!gpsStatus) return;
+            gpsStatus.className = "gps-status gps-highlight mt-3 small";
+            gpsStatus.classList.remove("paused", "waiting");
+
+            if (type === "secondary" || type === "danger") {
+                gpsStatus.classList.add("paused");
+            } else if (type === "muted" || type === "warning") {
+                gpsStatus.classList.add("waiting");
+            }
+
+            gpsStatus.textContent = message;
+        }
+
+        function actualizarAccionGps() {
+            if (!activarGpsBtn || !estadoInput) return;
+
+            const estadoActual = estadoInput.value;
+            const mostrarBoton = estadoActual !== "inactivo"
+                && (estadoPermisoUbicacion === "prompt" || estadoPermisoUbicacion === "denied");
+
+            activarGpsBtn.classList.toggle("d-none", !mostrarBoton);
+
+            if (estadoPermisoUbicacion === "denied") {
+                activarGpsBtn.innerHTML = '<i class="fas fa-location-arrow me-2"></i>Revisar permiso GPS';
+            } else {
+                activarGpsBtn.innerHTML = '<i class="fas fa-location-arrow me-2"></i>Activar ubicación';
+            }
+        }
+
+        function actualizarEstadoPermiso(valor) {
+            estadoPermisoUbicacion = valor || "unknown";
+            actualizarAccionGps();
+        }
+
+        function actualizarModoSeguimiento() {
+            const estadoActual = estadoInput ? estadoInput.value : "disponible";
+
+            if (!gpsDot || !gpsModeLabel) return;
+
+            if (gpsCard) {
+                gpsCard.classList.remove("gps-live", "gps-paused");
+            }
+
+            if (gpsModePill) {
+                gpsModePill.classList.remove("paused", "waiting");
+            }
+
+            if (estadoActual === "inactivo") {
+                if (gpsCard) {
+                    gpsCard.classList.add("gps-paused");
+                }
+                if (gpsModePill) {
+                    gpsModePill.classList.add("paused");
+                    gpsModePill.classList.remove("waiting");
+                }
+                gpsDot.style.background = "#6b7280";
+                gpsModeLabel.textContent = "Modo inactivo";
+                if (watchId !== null) {
+                    navigator.geolocation.clearWatch(watchId);
+                    watchId = null;
+                }
+                setGpsStatus("Tu ubicación está en pausa. Mientras tu perfil esté inactivo no se comparte tu GPS.", "secondary");
+                actualizarAccionGps();
+                return;
+            }
+
+            if (gpsCard) {
+                gpsCard.classList.add("gps-live");
+            }
+            if (gpsModePill) {
+                gpsModePill.classList.remove("paused", "waiting");
+            }
+            gpsDot.style.background = "#22c55e";
+            gpsModeLabel.textContent = estadoActual === "en_ruta"
+                ? "Ruta activa"
+                : "Disponible para compartir";
+            actualizarAccionGps();
+        }
+
+        async function fetchJson(url, options) {
+            const response = await fetch(url, {
+                credentials: "same-origin",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken,
+                    ...(options && options.headers ? options.headers : {}),
+                },
+                ...options,
+            });
+
+            let data = {};
+            try {
+                data = await response.json();
+            } catch (error) {
+                data = {};
+            }
+
+            if (!response.ok) {
+                throw new Error(data.detail || data.message || "No se pudo completar la operación.");
+            }
+
+            return data;
+        }
+
+        function updateEstadoBadge(estadoDisplay) {
+            if (!badgeEstadoActual) return;
+            badgeEstadoActual.innerHTML = `<i class="fas fa-signal"></i>${estadoDisplay}`;
+        }
+
+        function marcarBotonGuardado() {
+            if (!saveButton) return;
+
+            if (restaurarTextoBotonTimeout) {
+                clearTimeout(restaurarTextoBotonTimeout);
+            }
+
+            saveButton.innerHTML = '<i class="fas fa-check me-2"></i>Guardado';
+            saveButton.classList.remove("btn-danger");
+            saveButton.classList.add("btn-success");
+
+            restaurarTextoBotonTimeout = window.setTimeout(function () {
+                saveButton.classList.remove("btn-success");
+                saveButton.classList.add("btn-danger");
+                actualizarAyudaEstado();
+            }, 1800);
+        }
+
+        function mostrarConfirmacionCambioEstado(config) {
+            if (!confirmOverlay || !confirmText || !confirmNote || !confirmAcceptBtn || !confirmCancelBtn) {
+                return Promise.resolve(window.confirm(config.texto));
+            }
+
+            confirmText.textContent = config.texto;
+            confirmNote.textContent = config.nota;
+            confirmAcceptBtn.className = `btn ${config.acceptClass || "btn-danger"}`;
+
+            confirmOverlay.classList.add("visible");
+            confirmOverlay.setAttribute("aria-hidden", "false");
+
+            return new Promise((resolve) => {
+                function cerrar(resultado) {
+                    confirmOverlay.classList.remove("visible");
+                    confirmOverlay.setAttribute("aria-hidden", "true");
+                    confirmAcceptBtn.removeEventListener("click", onAccept);
+                    confirmCancelBtn.removeEventListener("click", onCancel);
+                    confirmOverlay.removeEventListener("click", onBackdrop);
+                    document.removeEventListener("keydown", onKeydown);
+                    resolve(resultado);
+                }
+
+                function onAccept() {
+                    cerrar(true);
+                }
+
+                function onCancel() {
+                    cerrar(false);
+                }
+
+                function onBackdrop(event) {
+                    if (event.target === confirmOverlay) {
+                        cerrar(false);
+                    }
+                }
+
+                function onKeydown(event) {
+                    if (event.key === "Escape") {
+                        cerrar(false);
+                    }
+                }
+
+                confirmAcceptBtn.addEventListener("click", onAccept);
+                confirmCancelBtn.addEventListener("click", onCancel);
+                confirmOverlay.addEventListener("click", onBackdrop);
+                document.addEventListener("keydown", onKeydown);
+            });
+        }
+
+        function actualizarAyudaEstado() {
+            if (!estadoInput) return;
+            const estadoSeleccionado = estadoInput.value;
+            const hayCambiosPendientes = estadoSeleccionado !== ultimoEstadoGuardado;
+
+            if (estadoWarning) {
+                estadoWarning.classList.remove("info");
+            }
+
+            if (estadoWarningText) {
+                estadoWarningText.textContent = "";
+            }
+
+            if (!saveButton) return;
+
+            if (estadoInput.disabled) {
+                if (estadoWarning) {
+                    estadoWarning.classList.add("d-none");
+                }
+                saveButton.innerHTML = '<i class="fas fa-save me-2"></i>Guardar vehículo';
+                return;
+            }
+
+            if (estadoSeleccionado === "inactivo") {
+                if (estadoWarning) {
+                    estadoWarning.classList.remove("d-none");
+                }
+                if (estadoWarningText) {
+                    estadoWarningText.textContent = hayCambiosPendientes
+                        ? "Si cambias a inactivo dejarás de recibir nuevos pedidos y se pausará el envío de tu ubicación hasta volver a disponible."
+                        : "Tu perfil está inactivo. No recibirás nuevos pedidos y tu ubicación permanecerá en pausa hasta que vuelvas a disponible.";
+                }
+            } else {
+                if (estadoWarning) {
+                    estadoWarning.classList.remove("d-none");
+                    estadoWarning.classList.add("info");
+                }
+                if (estadoWarningText) {
+                    estadoWarningText.textContent = hayCambiosPendientes
+                        ? "Si cambias a disponible podrás volver a recibir pedidos y compartir tu ubicación para operar con normalidad."
+                        : "Tu perfil está disponible. Puedes recibir pedidos y compartir tu ubicación para operar con normalidad.";
+                }
+            }
+
+            saveButton.innerHTML = estadoSeleccionado === "inactivo"
+                ? '<i class="fas fa-power-off me-2"></i>Guardar y pausar'
+                : '<i class="fas fa-save me-2"></i>Guardar perfil';
+        }
+
+        async function guardarPerfilOperativo(event) {
+            event.preventDefault();
+            const payload = {
+                vehiculo: vehiculoInput.value,
+            };
+
+            if (estadoInput && !estadoInput.disabled) {
+                payload.estado_actual = estadoInput.value;
+            }
+
+            try {
+                const data = await fetchJson(perfilUrl, {
+                    method: "PATCH",
+                    body: JSON.stringify(payload),
+                });
+
+                updateEstadoBadge(data.estado_actual_display);
+                if (payload.estado_actual) {
+                    ultimoEstadoGuardado = payload.estado_actual;
+                    ultimoEstadoConfirmado = payload.estado_actual;
+                }
+                setFormStatus("Perfil operativo actualizado correctamente.", "success");
+                marcarBotonGuardado();
+                actualizarModoSeguimiento();
+                actualizarAyudaEstado();
+                if (estadoInput.value === "disponible") {
+                    setGpsStatus("Tu perfil quedó disponible. Ya puedes volver a recibir pedidos y compartir tu ubicación para operar.", "success");
+                    sincronizarPermisoUbicacion();
+                    iniciarSeguimientoUbicacion();
+                } else if (estadoInput.value === "inactivo") {
+                    setGpsStatus("Tu perfil quedó inactivo. No recibirás nuevos pedidos y tu ubicación quedará pausada hasta que vuelvas a disponible.", "secondary");
+                }
+            } catch (error) {
+                setFormStatus(error.message, "danger");
+            }
+        }
+
+        async function confirmarCambioEstadoInmediato() {
+            if (!estadoInput || estadoInput.disabled) {
+                return;
+            }
+
+            const nuevoEstado = estadoInput.value;
+            if (nuevoEstado === ultimoEstadoConfirmado) {
+                actualizarModoSeguimiento();
+                actualizarAyudaEstado();
+                return;
+            }
+
+            const confirmacion = await mostrarConfirmacionCambioEstado(
+                nuevoEstado === "inactivo"
+                    ? {
+                        texto: "Vas a poner tu perfil en inactivo. Tu operación se pausará y dejarás de recibir nuevos pedidos.",
+                        nota: "Tu ubicación dejará de compartirse hasta que vuelvas a disponible.",
+                        acceptClass: "btn-danger",
+                    }
+                    : {
+                        texto: "Vas a volver a disponible. Podrás recibir nuevos pedidos y el sistema reactivará tu ubicación automáticamente.",
+                        nota: "Asegúrate de permitir el acceso al GPS del navegador para operar con normalidad.",
+                        acceptClass: "btn-success",
+                    }
+            );
+
+            if (!confirmacion) {
+                estadoInput.value = ultimoEstadoConfirmado;
+                setFormStatus("El cambio de estado fue cancelado.", "secondary");
+            } else {
+                ultimoEstadoConfirmado = nuevoEstado;
+                setFormStatus("Estado confirmado. Ahora guarda para aplicar el cambio.", "success");
+            }
+
+            actualizarModoSeguimiento();
+            actualizarAyudaEstado();
+        }
+
+        async function enviarUbicacion(position) {
+            try {
+                const data = await fetchJson(ubicacionUrl, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        latitud: Number(position.coords.latitude).toFixed(6),
+                        longitud: Number(position.coords.longitude).toFixed(6),
+                    }),
+                });
+
+                latitudValor.textContent = data.latitud;
+                longitudValor.textContent = data.longitud;
+                ultimaActualizacionValor.textContent = new Date(data.actualizado_en).toLocaleString();
+                if (gpsModePill) {
+                    gpsModePill.classList.remove("paused", "waiting");
+                }
+                if (gpsCard) {
+                    gpsCard.classList.remove("gps-paused");
+                    gpsCard.classList.add("gps-live");
+                }
+                if (gpsDot) {
+                    gpsDot.style.background = "#22c55e";
+                }
+                if (gpsModeLabel) {
+                    gpsModeLabel.textContent = estadoInput && estadoInput.value === "en_ruta"
+                        ? "Ruta activa"
+                        : "Ubicación activa";
+                }
+                actualizarEstadoPermiso("granted");
+                setGpsStatus("Ubicación compartiéndose correctamente. Tu posición se está actualizando en tiempo real.", "success");
+            } catch (error) {
+                if (gpsModePill) {
+                    gpsModePill.classList.remove("waiting");
+                    gpsModePill.classList.add("paused");
+                }
+                if (gpsDot) {
+                    gpsDot.style.background = "#ef4444";
+                }
+                if (gpsModeLabel) {
+                    gpsModeLabel.textContent = "Ubicación con error";
+                }
+                setGpsStatus(error.message, "danger");
+                actualizarAccionGps();
+            }
+        }
+
+        function manejarErrorGps(error) {
+            const messages = {
+                1: "Permiso de ubicación denegado. Debes permitir el GPS del navegador.",
+                2: "No se pudo obtener tu ubicación actual.",
+                3: "Se agotó el tiempo de espera al solicitar tu ubicación.",
+            };
+            if (gpsModePill) {
+                gpsModePill.classList.remove("waiting");
+                gpsModePill.classList.add("paused");
+            }
+            if (gpsDot) {
+                gpsDot.style.background = "#ef4444";
+            }
+            if (gpsModeLabel) {
+                gpsModeLabel.textContent = error.code === 1
+                    ? "Permiso denegado"
+                    : "Ubicación con error";
+            }
+            if (error.code === 1) {
+                actualizarEstadoPermiso("denied");
+            } else {
+                actualizarAccionGps();
+            }
+            setGpsStatus(messages[error.code] || "No se pudo acceder a tu ubicación.", "danger");
+        }
+
+        async function sincronizarPermisoUbicacion() {
+            if (!navigator.permissions || !navigator.permissions.query) {
+                actualizarAccionGps();
+                return;
+            }
+
+            try {
+                const permissionStatus = await navigator.permissions.query({ name: "geolocation" });
+                actualizarEstadoPermiso(permissionStatus.state);
+                permissionStatus.onchange = function () {
+                    actualizarEstadoPermiso(permissionStatus.state);
+
+                    if (permissionStatus.state === "granted" && estadoInput && estadoInput.value !== "inactivo") {
+                        iniciarSeguimientoUbicacion();
+                    }
+
+                    if (permissionStatus.state === "denied") {
+                        setGpsStatus("El navegador tiene bloqueado el acceso a la ubicación. Habilítalo desde el icono del sitio para volver a compartir GPS.", "danger");
+                    }
+                };
+            } catch (error) {
+                actualizarAccionGps();
+            }
+        }
+
+        function iniciarSeguimientoUbicacion() {
+            if (estadoInput && estadoInput.value === "inactivo") {
+                setGpsStatus("Cambia tu estado a disponible para compartir ubicación.", "secondary");
+                return;
+            }
+
+            if (!navigator.geolocation) {
+                setGpsStatus("Tu navegador no soporta geolocalización.", "danger");
+                return;
+            }
+
+            if (estadoPermisoUbicacion === "denied") {
+                if (gpsModePill) {
+                    gpsModePill.classList.remove("waiting");
+                    gpsModePill.classList.add("paused");
+                }
+                if (gpsDot) {
+                    gpsDot.style.background = "#ef4444";
+                }
+                if (gpsModeLabel) {
+                    gpsModeLabel.textContent = "Permiso bloqueado";
+                }
+                setGpsStatus("El permiso de ubicación está bloqueado en el navegador. Debes habilitarlo manualmente desde la configuración del sitio.", "danger");
+                actualizarAccionGps();
+                return;
+            }
+
+            if (gpsModePill) {
+                gpsModePill.classList.add("waiting");
+            }
+            gpsModeLabel.textContent = "Esperando permiso GPS";
+            gpsDot.style.background = "#f97316";
+            setGpsStatus("Solicitando permiso para acceder a tu ubicación y activar el seguimiento.", "muted");
+
+            if (watchId !== null) {
+                navigator.geolocation.clearWatch(watchId);
+            }
+
+            watchId = navigator.geolocation.watchPosition(
+                enviarUbicacion,
+                manejarErrorGps,
+                {
+                    enableHighAccuracy: true,
+                    maximumAge: 10000,
+                    timeout: 10000,
+                }
+            );
+        }
+
+        if (form) {
+            form.addEventListener("submit", guardarPerfilOperativo);
+        }
+
+        if (estadoInput) {
+            estadoInput.addEventListener("change", function () {
+                actualizarModoSeguimiento();
+                actualizarAyudaEstado();
+            });
+            estadoInput.addEventListener("change", confirmarCambioEstadoInmediato);
+        }
+
+        if (activarGpsBtn) {
+            activarGpsBtn.addEventListener("click", function () {
+                if (estadoPermisoUbicacion === "denied") {
+                    setGpsStatus("El navegador ya bloqueó la ubicación para este sitio. Usa el icono de candado o ubicación en la barra del navegador y vuelve a permitir el acceso.", "danger");
+                    return;
+                }
+
+                sincronizarPermisoUbicacion();
+                iniciarSeguimientoUbicacion();
+            });
+        }
+
+        actualizarModoSeguimiento();
+        actualizarAyudaEstado();
+        sincronizarPermisoUbicacion();
+        iniciarSeguimientoUbicacion();
+    })();
+</script>
+{% endif %}
+{% endblock %}

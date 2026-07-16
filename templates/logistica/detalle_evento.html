@@ -1,0 +1,214 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalle del Evento | Delivery NATIVO{% endblock %}
+
+{% block content %}
+<style>
+    .detail-hero,
+    .detail-card,
+    .timeline-card {
+        border: 0;
+        border-radius: 24px;
+        box-shadow: 0 14px 34px rgba(31, 41, 55, 0.07);
+    }
+
+    .detail-hero {
+        background: linear-gradient(135deg, #fff5f1 0%, #ffffff 54%, #ffe9df 100%);
+        border: 1px solid rgba(220, 53, 69, 0.08);
+    }
+
+    .detail-kicker {
+        font-size: 0.76rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #8b6b65;
+        margin-bottom: 0.35rem;
+    }
+
+    .detail-value {
+        font-weight: 700;
+        color: #1f2937;
+    }
+
+    .detail-info-box {
+        border-radius: 18px;
+        background: #fffaf8;
+        border: 1px solid rgba(31, 41, 55, 0.06);
+        padding: 1rem 1.05rem;
+        height: 100%;
+    }
+
+    .detail-note {
+        border-radius: 20px;
+        background: linear-gradient(180deg, #ffffff 0%, #fff8f4 100%);
+        border: 1px solid rgba(220, 53, 69, 0.08);
+        padding: 1rem 1.1rem;
+        color: #514a57;
+        line-height: 1.6;
+    }
+
+    .pedido-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.48rem 0.8rem;
+        border-radius: 999px;
+        background: #fff1ec;
+        color: #c73645;
+        font-weight: 800;
+        border: 1px solid rgba(220, 53, 69, 0.12);
+    }
+
+    .event-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.48rem 0.8rem;
+        border-radius: 999px;
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+    }
+
+    .event-badge.assigned {
+        background: #fff4e8;
+        color: #b45309;
+        border: 1px solid rgba(180, 83, 9, 0.14);
+    }
+
+    .event-badge.picked {
+        background: #ecfeff;
+        color: #0f766e;
+        border: 1px solid rgba(15, 118, 110, 0.14);
+    }
+
+    .event-badge.delivered {
+        background: #ecfdf3;
+        color: #166534;
+        border: 1px solid rgba(22, 101, 52, 0.14);
+    }
+
+    .history-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        text-decoration: none;
+        color: #c73645;
+        font-weight: 700;
+    }
+
+    .history-link:hover {
+        color: #a61f33;
+    }
+
+    .timeline-item + .timeline-item {
+        border-top: 1px solid rgba(31, 41, 55, 0.06);
+    }
+
+    .timeline-item {
+        padding: 1rem 0;
+    }
+</style>
+
+<div class="row justify-content-center">
+    <div class="col-xl-10">
+        <div class="detail-hero p-4 p-lg-5 mb-4">
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-4">
+                <div>
+                    <p class="text-danger fw-semibold mb-2 text-uppercase small">Detalle logistico</p>
+                    <h1 class="display-6 fw-bold mb-2">Evento del Pedido #{{ evento.pedido.id }}</h1>
+                    <p class="text-muted mb-0">Revisa el contexto completo del evento, la observacion registrada y la linea de tiempo del pedido.</p>
+                </div>
+                <span class="{{ evento.badge_class }}">{{ evento.get_evento_display }}</span>
+            </div>
+        </div>
+
+        {% include 'logistica/_nav_repartidor.html' %}
+
+        {% if acceso_denegado %}
+        <div class="card detail-card">
+            <div class="card-body p-5 text-center">
+                <h2 class="h4 fw-bold">Acceso solo para repartidores</h2>
+            </div>
+        </div>
+        {% else %}
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="card detail-card">
+                    <div class="card-body p-4 p-lg-5">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <a href="{% url 'logistica:mi_historial' %}" class="btn btn-outline-secondary btn-sm">
+                                <i class="fas fa-arrow-left me-2"></i>Volver al historial
+                            </a>
+                            <span class="pedido-pill"><i class="fas fa-receipt"></i>#{{ evento.pedido.id }}</span>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <div class="detail-info-box">
+                                    <div class="detail-kicker">Fecha del evento</div>
+                                    <div class="detail-value">{{ evento.fecha|date:"d/m/Y H:i" }}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="detail-info-box">
+                                    <div class="detail-kicker">Estado actual del pedido</div>
+                                    <div class="detail-value">{{ evento.pedido.get_estado_display }}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="detail-info-box">
+                                    <div class="detail-kicker">Cliente</div>
+                                    <div class="detail-value">{{ evento.pedido.cliente.username }}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="detail-info-box">
+                                    <div class="detail-kicker">Sede</div>
+                                    <div class="detail-value">{{ evento.pedido.sede.nombre_comercial }} - {{ evento.pedido.sede.nombre }}</div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="detail-info-box">
+                                    <div class="detail-kicker">Direccion de entrega</div>
+                                    <div class="detail-value">{{ evento.pedido.direccion_entrega }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="detail-kicker">Observacion registrada</div>
+                        <div class="detail-note">
+                            {% if evento.observacion %}
+                                {{ evento.observacion }}
+                            {% else %}
+                                No se registro una observacion manual para este evento.
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="card timeline-card">
+                    <div class="card-body p-4 p-lg-5">
+                        <div class="detail-kicker">Linea de tiempo</div>
+                        <h2 class="h4 fw-bold mb-4">Eventos del mismo pedido</h2>
+
+                        {% for item in timeline %}
+                        <div class="timeline-item">
+                            <div class="d-flex justify-content-between align-items-start gap-3 mb-2">
+                                <span class="{{ item.badge_class }}">{{ item.get_evento_display }}</span>
+                                <small class="text-muted fw-semibold">{{ item.fecha|date:"d/m H:i" }}</small>
+                            </div>
+                            <div class="fw-semibold text-dark mb-1">{{ item.observacion_resumida }}</div>
+                            <a href="{% url 'logistica:detalle_evento_historial' item.id %}" class="history-link">Abrir este evento</a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

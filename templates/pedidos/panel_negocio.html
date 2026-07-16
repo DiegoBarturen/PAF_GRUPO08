@@ -1,0 +1,1036 @@
+{% extends 'base.html' %}
+
+{% block extra_js %}
+<style>
+    /* ... (Todo el CSS que ya tenías se mantiene igual) ... */
+    body {
+        background-color: #f8f9fa;
+    }
+
+    .portal-layout {
+        display: flex;
+        min-height: calc(100vh - 65px);
+        margin: -1.5rem -0.75rem;
+    }
+
+    .portal-sidebar {
+        width: 260px;
+        background-color: #fff;
+        border-right: 1px solid #e5e7eb;
+        display: flex;
+        flex-direction: column;
+        flex-shrink: 0;
+        padding-top: 15px;
+    }
+
+    .sidebar-section {
+        padding: 15px 20px 5px;
+        font-size: 0.75rem;
+        color: #9ca3af;
+        text-transform: uppercase;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+
+    .sidebar-link {
+        display: flex;
+        align-items: center;
+        padding: 12px 20px;
+        color: #4b5563;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        border-left: 4px solid transparent;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+
+    .sidebar-link:hover {
+        background-color: #f9fafb;
+        color: #111827;
+    }
+
+    .sidebar-link.active {
+        color: #e11d48;
+        border-left-color: #e11d48;
+        background-color: #fff1f2;
+    }
+
+    .sidebar-link i {
+        width: 24px;
+        font-size: 1.1rem;
+        margin-right: 10px;
+        color: inherit;
+    }
+
+    .portal-content {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        background-color: #fcfcfc;
+        overflow-x: hidden;
+    }
+
+    .status-banner {
+        background-color: #fee2e2;
+        color: #991b1b;
+        padding: 12px 30px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        border-bottom: 1px solid #fecaca;
+    }
+
+    .status-banner.open {
+        background-color: #d1fae5;
+        color: #065f46;
+        border-bottom: 1px solid #a7f3d0;
+    }
+
+    .portal-header {
+        padding: 25px 30px;
+        background-color: #fff;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .portal-title {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: #111;
+        margin: 0;
+    }
+
+    .header-controls {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .btn-pill {
+        border-radius: 50px;
+        padding: 8px 18px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        border: 1px solid #e5e7eb;
+        background: #fff;
+        color: #374151;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        cursor: pointer;
+    }
+
+    .portal-inner {
+        padding: 30px;
+    }
+
+    .summary-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 24px;
+        margin-bottom: 40px;
+    }
+
+    .py-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        padding: 24px;
+    }
+
+    .py-card-title {
+        font-size: 1.2rem;
+        font-weight: 800;
+        margin-bottom: 24px;
+        color: #111;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .status-list-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 0;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    .status-list-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .status-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #f3f4f6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        color: #6b7280;
+    }
+
+    .status-value {
+        font-weight: 800;
+        font-size: 1.15rem;
+    }
+
+    .ticket-card {
+        border-radius: 16px;
+        border: 1px solid #e5e7eb;
+        border-left: 6px solid transparent;
+        background: #fff;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .ticket-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    .estado-RE {
+        border-left-color: #f59e0b;
+    }
+
+    .estado-CO {
+        border-left-color: #3b82f6;
+    }
+
+    .estado-PR {
+        border-left-color: #8b5cf6;
+    }
+
+    .estado-LI {
+        border-left-color: #10b981;
+    }
+
+    .item-list {
+        background-color: #f9fafb;
+        border-radius: 8px;
+        padding: 12px;
+    }
+
+    /* CSS Nuevo para las transiciones */
+    .seccion-panel {
+        display: none;
+        animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .seccion-panel.activa {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Estilos Premium para el Tablero */
+    .kpi-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .kpi-card-premium {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid #e5e7eb;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .kpi-card-premium:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+    }
+
+    .kpi-info h3 {
+        font-size: 1.8rem;
+        font-weight: 800;
+        margin: 5px 0 0 0;
+        color: #111827;
+    }
+
+    .kpi-info span {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .kpi-icon-wrapper {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+    }
+
+    .kpi-green {
+        background-color: #d1fae5;
+        color: #065f46;
+    }
+
+    .kpi-blue {
+        background-color: #dbeafe;
+        color: #1e40af;
+    }
+
+    .kpi-red {
+        background-color: #fee2e2;
+        color: #991b1b;
+    }
+
+    .kpi-yellow {
+        background-color: #fef3c7;
+        color: #92400e;
+    }
+
+    .chart-and-reviews-grid {
+        display: grid;
+        grid-template-columns: 3fr 2fr;
+        gap: 24px;
+    }
+
+    @media (max-width: 991px) {
+        .chart-and-reviews-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="portal-layout">
+
+    <!-- BARRA LATERAL (SIDEBAR) -->
+    <aside class="portal-sidebar d-none d-lg-flex">
+        <div class="px-4 mb-3 mt-2">
+            <h4 class="fw-bold text-danger m-0" style="letter-spacing: -0.5px;">
+                Nativo <span class="badge bg-danger ms-1"
+                    style="font-size:0.65rem; vertical-align: middle;">Portal</span>
+            </h4>
+        </div>
+
+        <div class="sidebar-section">Monitorea tu desempeño</div>
+
+        <!-- ENLACES INTERACTIVOS JS -->
+        <a onclick="cambiarPestana('procesamiento', this)" class="sidebar-link active" id="nav-procesamiento">
+            <i class="fas fa-shopping-bag"></i> Procesamiento
+        </a>
+        <a onclick="cambiarPestana('tablero', this)" class="sidebar-link" id="nav-tablero">
+            <i class="fas fa-th-large"></i> Tablero
+        </a>
+        <a onclick="cambiarPestana('reportes', this)" class="sidebar-link" id="nav-reportes">
+            <i class="fas fa-chart-bar"></i> Reportes
+        </a>
+        <a onclick="cambiarPestana('evaluaciones', this)" class="sidebar-link" id="nav-evaluaciones">
+            <i class="far fa-star"></i> Evaluación y opiniones
+        </a>
+
+        <div class="sidebar-section mt-3">Potencia tu negocio</div>
+        <a onclick="cambiarPestana('publicidad', this)" class="sidebar-link" id="nav-publicidad">
+            <i class="fas fa-bullhorn"></i> Publicidad en la app
+        </a>
+        <a onclick="cambiarPestana('promociones', this)" class="sidebar-link" id="nav-promociones">
+            <i class="fas fa-tag"></i> Promociones
+        </a>
+
+        <div class="sidebar-section mt-3">Gestiona tu local</div>
+        <a href="{% url 'gestionar_sedes' %}" class="sidebar-link"><i class="fas fa-store"></i> Mis Sedes</a>
+        <a href="{% url 'administrar_productos' %}" class="sidebar-link"><i class="fas fa-hamburger"></i> Menú</a>
+        <a onclick="cambiarPestana('horarios', this)" class="sidebar-link" id="nav-horarios"><i
+                class="far fa-clock"></i> Horarios</a>
+
+        <div class="sidebar-section mt-3">Configuración</div>
+        {% if request.user.es_negocio and not request.user.negocio %}
+        <a href="{% url 'editar_mi_sede' %}" class="sidebar-link"><i class="fas fa-cog"></i> Configurar Sede</a>
+        {% else %}
+        <a href="{% url 'registrar_negocio' %}" class="sidebar-link"><i class="fas fa-cog"></i> Configuración</a>
+        {% endif %}
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <div class="portal-content">
+
+        <!-- Banner de Apertura -->
+        {% if sede %}
+        {% if sede.abierto %}
+        <div class="status-banner open">
+            <i class="fas fa-door-open me-2"></i> Estás abierto. Los clientes pueden ver tu menú y hacer pedidos en {{
+            sede.nombre }}.
+        </div>
+        {% else %}
+        <div class="status-banner">
+            <i class="fas fa-door-closed me-2"></i> Estás cerrado. Los clientes no pueden realizar pedidos en {{
+            sede.nombre }}.
+        </div>
+        {% endif %}
+        {% endif %}
+
+        <header class="portal-header flex-column flex-md-row gap-3">
+            <div>
+                <!-- Este título cambiará dinámicamente -->
+                <h1 class="portal-title" id="titulo-cabecera">Procesamiento</h1>
+                <div class="text-danger small fw-bold mt-1">
+                    {% if sede %}{{ sede.negocio.nombre_comercial }} - {{ sede.nombre }}{% else %}Local{% endif %}
+                </div>
+            </div>
+            <div class="header-controls">
+                <div class="btn-pill">
+                    {% if sede and sede.abierto %}
+                    <span
+                        style="width:12px; height:12px; border-radius:50%; background-color:#10b981; display:inline-block;"></span>
+                    Abierto
+                    {% else %}
+                    <span
+                        style="width:12px; height:12px; border-radius:50%; background-color:#ef4444; display:inline-block;"></span>
+                    Cerrado
+                    {% endif %}
+                </div>
+                <div class="btn-pill px-3"><i class="far fa-bell"></i></div>
+            </div>
+        </header>
+
+        <div class="portal-inner">
+
+            <!-- Alertas de Stock Bajo -->
+            {% if productos_bajo_stock %}
+            <div class="alert alert-warning border-0 rounded-4 shadow-sm p-4 mb-4"
+                style="background: #fffbeb; border: 1px solid #fef3c7 !important; border-radius: 16px !important;">
+                <div class="d-flex align-items-center gap-3 mb-2">
+                    <div class="bg-warning bg-opacity-20 text-warning rounded-3 d-flex align-items-center justify-content-center"
+                        style="width: 40px; height: 40px; border-radius: 10px !important;">
+                        <i class="fas fa-exclamation-triangle fs-5 text-warning"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold text-dark mb-0">¡Alerta de inventario bajo!</h5>
+                        <p class="text-muted small mb-0">Los siguientes productos tienen 3 o menos unidades disponibles
+                            y necesitan reposición:</p>
+                    </div>
+                </div>
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-2 mt-2">
+                    {% for p in productos_bajo_stock %}
+                    <div class="col">
+                        <div class="p-2 rounded-3 bg-white border d-flex justify-content-between align-items-center">
+                            <span class="fw-semibold text-dark small">{{ p.nombre }}</span>
+                            <span class="badge bg-danger rounded-pill">{{ p.stock }} en stock</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="mt-3 text-end">
+                    <a href="{% url 'administrar_productos' %}"
+                        class="btn btn-warning btn-sm rounded-pill fw-bold text-dark px-3 shadow-sm">Gestionar Menú</a>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- 1. SECCIÓN: PROCESAMIENTO (ACTIVA POR DEFECTO) -->
+            <div id="seccion-procesamiento" class="seccion-panel activa">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="fw-bold fs-4 m-0">Procesamiento de pedidos</h3>
+                    <button onclick="window.location.reload();"
+                        class="btn btn-outline-dark rounded-pill fw-bold bg-white shadow-sm">
+                        <i class="fas fa-sync-alt me-1"></i> Refrescar
+                    </button>
+                </div>
+
+                <div class="row g-4">
+                    {% for pedido in pedidos %}
+                    <div class="col-12 col-md-6 col-xl-4">
+                        <div class="card h-100 p-4 ticket-card estado-{{ pedido.estado }}">
+
+                            <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-3">
+                                <div>
+                                    <span class="text-muted small fw-bold text-uppercase">Orden N°</span>
+                                    <h4 class="fw-bold m-0 text-dark">#{{ pedido.id }}</h4>
+                                </div>
+                                <span class="badge bg-light text-dark border px-3 py-2 rounded-pill shadow-sm">
+                                    <i class="far fa-clock text-danger me-1"></i> {{ pedido.fecha_creacion|date:"H:i" }}
+                                </span>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-3"
+                                        style="width: 40px; height: 40px;">
+                                        <i class="fas fa-user text-muted"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="fw-bold m-0 text-dark" style="font-size: 1rem;">{{
+                                            pedido.cliente.get_full_name|default:pedido.cliente.username }}</h6>
+                                        <small class="text-muted"><i class="fas fa-map-marker-alt text-danger me-1"></i>
+                                            {{ pedido.direccion_entrega|truncatechars:35 }}</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="item-list mb-4 flex-grow-1 border">
+                                <ul class="list-unstyled m-0">
+                                    {% for item in pedido.items_pedido.all %}
+                                    <li class="d-flex justify-content-between align-items-center py-2">
+                                        <span class="text-dark fw-bold" style="font-size: 0.95rem;">
+                                            <span class="badge bg-danger rounded-pill me-2 px-2">{{ item.cantidad
+                                                }}</span>
+                                            {{ item.producto.nombre|truncatechars:20 }}
+                                        </span>
+                                        <span class="text-muted fw-bold">S/ {{ item.subtotal }}</span>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <span class="fw-bold text-muted text-uppercase small">Total:</span>
+                                <h4 class="fw-bold text-danger m-0">S/ {{ pedido.total|floatformat:2 }}</h4>
+                            </div>
+
+                            <div class="mt-auto border-top pt-3">
+                                <form action="{% url 'pedidos:cambiar_estado' pedido.id %}" method="POST"
+                                    class="d-flex gap-2">
+                                    {% csrf_token %}
+                                    {% if pedido.estado == 'EN' or pedido.estado == 'CN' %}
+                                    <select disabled class="form-select bg-light border-0 fw-bold text-dark opacity-75">
+                                        <option>{% if pedido.estado == 'EN' %}🏁 Entregado{% else %}❌ Cancelado{% endif
+                                            %}</option>
+                                    </select>
+                                    {% else %}
+                                    <select name="estado" class="form-select bg-light border-0 fw-bold text-dark">
+                                        <option value="RE" {% if pedido.estado=='RE' %}selected{% endif %}>🟢 Recibido
+                                        </option>
+                                        <option value="CO" {% if pedido.estado=='CO' %}selected{% endif %}>🔵 Confirmado
+                                        </option>
+                                        <option value="PR" {% if pedido.estado=='PR' %}selected{% endif %}>🟣
+                                            Preparación
+                                        </option>
+                                        <option value="LI" {% if pedido.estado=='LI' %}selected{% endif %}>✅ Listo
+                                            (Recojo)
+                                        </option>
+                                        <option disabled>──────</option>
+                                        <option value="CA" {% if pedido.estado=='CA' %}selected{% endif %}>🛵 En camino
+                                        </option>
+                                        <option value="EN" {% if pedido.estado=='EN' %}selected{% endif %}>🏁 Entregado
+                                        </option>
+                                        <option value="CN" {% if pedido.estado=='CN' %}selected{% endif %}>❌ Cancelar
+                                        </option>
+                                    </select>
+                                    <button type="submit" class="btn btn-danger rounded-3 px-3 shadow-sm">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    {% endif %}
+                                </form>
+                            </div>
+
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-12 text-center py-5">
+                        <div class="bg-white p-5 rounded-4 border mx-auto shadow-sm" style="max-width: 500px;">
+                            <i class="fas fa-clipboard-check text-muted display-3 mb-4 opacity-50"></i>
+                            <h4 class="fw-bold text-dark">Sin pedidos activos</h4>
+                            <p class="text-muted mb-0">Los pedidos entrantes aparecerán aquí en tiempo real.</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- 2. SECCIÓN: TABLERO (ESTADÍSTICAS) -->
+            <div id="seccion-tablero" class="seccion-panel">
+                <h4 class="fw-bold mb-4 text-dark"><i class="fas fa-th-large text-danger me-2"></i>Tablero de Control
+                </h4>
+
+                <!-- KPI Cards -->
+                <div class="kpi-container">
+                    <!-- Ingresos -->
+                    <div class="kpi-card-premium">
+                        <div class="kpi-info">
+                            <span>Ingresos Entregados</span>
+                            <h3>S/ {{ ingresos_estimados|floatformat:2 }}</h3>
+                        </div>
+                        <div class="kpi-icon-wrapper kpi-green">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                    </div>
+
+                    <!-- Entregados -->
+                    <div class="kpi-card-premium">
+                        <div class="kpi-info">
+                            <span>Entregados con éxito</span>
+                            <h3>{{ total_completados }}</h3>
+                        </div>
+                        <div class="kpi-icon-wrapper kpi-blue">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+
+                    <!-- Cancelados -->
+                    <div class="kpi-card-premium">
+                        <div class="kpi-info">
+                            <span>Pedidos Cancelados</span>
+                            <h3>{{ total_cancelados }}</h3>
+                        </div>
+                        <div class="kpi-icon-wrapper kpi-red">
+                            <i class="fas fa-times-circle"></i>
+                        </div>
+                    </div>
+
+                    <!-- Puntuación -->
+                    <div class="kpi-card-premium">
+                        <div class="kpi-info">
+                            <span>Valoración Promedio</span>
+                            <h3>
+                                {{ valoracion_promedio|default:"5.0" }}
+                                <span style="font-size: 1rem; color: #fbbf24;"><i class="fas fa-star"></i></span>
+                            </h3>
+                        </div>
+                        <div class="kpi-icon-wrapper kpi-yellow">
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráfico y Últimas opiniones -->
+                <div class="chart-and-reviews-grid">
+                    <div class="py-card">
+                        <h5 class="fw-bold text-dark mb-4">
+                            <i class="fas fa-chart-pie text-muted me-2"></i>Distribución de Pedidos
+                        </h5>
+
+                        <div class="mb-4">
+                            <div class="text-muted small fw-bold text-uppercase mb-1">Pedidos Activos en Cocina</div>
+                            <h2 class="fw-bold text-primary mb-0">{{ total_activos }}</h2>
+                        </div>
+
+                        <h6 class="fw-bold text-muted text-uppercase small mb-3">Gráfico de Distribución</h6>
+                        <!-- Gráfico de barras CSS premium -->
+                        <div class="d-flex align-items-end justify-content-between pt-3"
+                            style="height: 180px; border-left: 1px solid #e5e7eb; border-bottom: 1px solid #e5e7eb; padding-left: 20px;">
+
+                            {% widthratio total_activos 10 120 as h_activos %}
+                            <div class="d-flex flex-column align-items-center w-100">
+                                <div class="bg-primary rounded-top bar-chart-dynamic"
+                                    style="width: 30px; min-height: 8px;" data-h="{{ h_activos|default:'15' }}">
+                                </div>
+                                <span class="text-muted mt-2" style="font-size: 0.75rem; font-weight: 600;">Activos ({{
+                                    total_activos }})</span>
+                            </div>
+
+                            {% widthratio total_completados 10 120 as h_completados %}
+                            <div class="d-flex flex-column align-items-center w-100">
+                                <div class="bg-success rounded-top bar-chart-dynamic"
+                                    style="width: 30px; min-height: 8px;" data-h="{{ h_completados|default:'15' }}">
+                                </div>
+                                <span class="text-muted mt-2" style="font-size: 0.75rem; font-weight: 600;">Entregados
+                                    ({{ total_completados }})</span>
+                            </div>
+
+                            {% widthratio total_cancelados 10 120 as h_cancelados %}
+                            <div class="d-flex flex-column align-items-center w-100">
+                                <div class="bg-danger rounded-top bar-chart-dynamic"
+                                    style="width: 30px; min-height: 8px;" data-h="{{ h_cancelados|default:'15' }}">
+                                </div>
+                                <span class="text-muted mt-2" style="font-size: 0.75rem; font-weight: 600;">Cancelados
+                                    ({{ total_cancelados }})</span>
+                            </div>
+                        </div>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                document.querySelectorAll('.bar-chart-dynamic').forEach(function(bar) {
+                                    bar.style.height = bar.getAttribute('data-h') + 'px';
+                                });
+                            });
+                        </script>
+                    </div>
+
+                    <!-- Opiniones Recientes en el Dashboard -->
+                    <div class="py-card">
+                        <h5 class="fw-bold text-dark mb-4">
+                            <i class="far fa-comments text-muted me-2"></i>Opiniones Recientes
+                        </h5>
+                        <div class="opiniones-container" style="max-height: 280px; overflow-y: auto;">
+                            {% for val in valoraciones|slice:":3" %}
+                            <div class="pb-3 mb-3 border-bottom">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <h6 class="fw-bold text-dark m-0" style="font-size: 0.9rem;">
+                                        {{ val.cliente.get_full_name|default:val.cliente.username }}
+                                    </h6>
+                                    <span class="text-warning small">
+                                        {% for i in "12345"|make_list %}
+                                        {% if forloop.counter <= val.puntos %} <i class="fas fa-star"></i>
+                                            {% else %}
+                                            <i class="far fa-star"></i>
+                                            {% endif %}
+                                            {% endfor %}
+                                    </span>
+                                </div>
+                                <p class="text-muted small mb-1">{{ val.comentario }}</p>
+                                <small class="text-muted text-uppercase" style="font-size: 0.65rem;">{{
+                                    val.fecha|date:"d M Y" }}</small>
+                            </div>
+                            {% empty %}
+                            <div class="text-center py-5 text-muted small">
+                                <i class="far fa-comment-dots fa-2x mb-2 opacity-50"></i>
+                                <p class="mb-0">Aún no hay opiniones de clientes.</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. SECCIÓN: REPORTES -->
+            <div id="seccion-reportes" class="seccion-panel">
+                <div class="py-card mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h4 class="fw-bold m-0 text-dark">Historial de Ventas</h4>
+                            <p class="text-muted small mb-0">Revisa la lista completa de pedidos y descarga el balance
+                                en formato CSV.</p>
+                        </div>
+                        <a href="{% url 'pedidos:exportar_reporte_negocio' %}"
+                            class="btn btn-outline-danger rounded-pill fw-bold">
+                            <i class="fas fa-download me-1"></i> Descargar Reporte CSV
+                        </a>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle border-top">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Orden ID</th>
+                                    <th>Cliente</th>
+                                    <th>Fecha</th>
+                                    <th>Estado</th>
+                                    <th class="text-end">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for p in pedidos %}
+                                <tr>
+                                    <td class="fw-bold">#{{ p.id }}</td>
+                                    <td>{{ p.cliente.username }}</td>
+                                    <td>{{ p.fecha_creacion|date:"d M Y - H:i" }}</td>
+                                    <td>
+                                        <span
+                                            class="badge rounded-pill 
+                                            {% if p.estado == 'EN' %}bg-success-subtle text-success border border-success
+                                            {% elif p.estado == 'CN' %}bg-danger-subtle text-danger border border-danger
+                                            {% else %}bg-warning-subtle text-warning border border-warning{% endif %} px-2 py-1">
+                                            {{ p.get_estado_display }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end fw-bold">S/ {{ p.total|floatformat:2 }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-4 text-muted">No se registran ventas aún.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. SECCIÓN: EVALUACIONES Y OPINIONES -->
+            <div id="seccion-evaluaciones" class="seccion-panel">
+                <div class="row g-4">
+                    <div class="col-12 col-md-4">
+                        <div class="py-card text-center">
+                            <h5 class="fw-bold text-muted mb-2 text-uppercase small">Calificación Promedio</h5>
+                            <h1 class="display-3 fw-bold text-danger mb-2">{{ valoracion_promedio }}</h1>
+                            <div class="text-warning fs-4 mb-3">
+                                {% for star in valoracion_estrellas %}
+                                <i class="fas fa-star"></i>
+                                {% empty %}
+                                <i class="far fa-star text-muted"></i>
+                                <i class="far fa-star text-muted"></i>
+                                <i class="far fa-star text-muted"></i>
+                                <i class="far fa-star text-muted"></i>
+                                <i class="far fa-star text-muted"></i>
+                                {% endfor %}
+                            </div>
+                            <p class="text-muted small m-0">Basado en {{ valoraciones.count }} opiniones de clientes.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-8">
+                        <div class="py-card">
+                            <h5 class="fw-bold mb-4 text-dark">Opiniones de los Clientes</h5>
+                            <div class="review-list" style="max-height: 400px; overflow-y: auto;">
+                                {% for v in valoraciones %}
+                                <div class="border-bottom py-3 {% if forloop.last %}border-0 pb-0{% endif %}">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <h6 class="fw-bold text-dark m-0">{{ v.cliente.username }}</h6>
+                                        <span class="text-warning text-sm">
+                                            {{ v.puntuacion }} ★
+                                        </span>
+                                    </div>
+                                    <p class="text-muted small mb-2">{{ v.comentario|default:"Sin comentarios." }}</p>
+                                    <small class="text-muted text-xs d-block">{{ v.fecha|date:"d M Y - H:i" }}</small>
+                                </div>
+                                {% empty %}
+                                <p class="text-muted text-center py-4">Aún no se han recibido valoraciones.</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. SECCIÓN: PUBLICIDAD EN LA APP -->
+            <div id="seccion-publicidad" class="seccion-panel">
+                <div class="py-card">
+                    <h4 class="fw-bold mb-3 text-dark"><i class="fas fa-bullhorn text-danger me-2"></i>Publicidad del
+                        Local</h4>
+                    <p class="text-muted">Aumenta las ventas destacando tu negocio en la página principal del catálogo.
+                    </p>
+
+                    <hr class="my-4">
+
+                    <div class="row align-items-center">
+                        <div class="col-md-7">
+                            <h5 class="fw-bold text-dark">Campaña "Local Destacado"</h5>
+                            <p class="text-muted small">Tu restaurante aparecerá con una insignia especial de
+                                <b>Destacado</b> en la parte superior de la página principal para todos los usuarios
+                                clientes de la zona.
+                            </p>
+                            <div class="mt-4">
+                                <form action="{% url 'pedidos:actualizar_publicidad' %}" method="POST">
+                                    {% csrf_token %}
+                                    {% if negocio.destacado %}
+                                    <input type="hidden" name="destacado" value="false">
+                                    <button type="submit" class="btn btn-outline-danger rounded-pill fw-bold px-4">
+                                        Detener Campaña de Publicidad
+                                    </button>
+                                    {% else %}
+                                    <input type="hidden" name="destacado" value="true">
+                                    <button type="submit" class="btn btn-danger rounded-pill fw-bold px-4">
+                                        Activar Campaña (Destacar Gratis)
+                                    </button>
+                                    {% endif %}
+                                </form>
+                            </div>
+                        </div>
+                        <div class="col-md-5 text-center py-4">
+                            {% if negocio.destacado %}
+                            <div class="bg-success-subtle text-success border border-success rounded-4 p-4 shadow-sm">
+                                <i class="fas fa-award fa-4x mb-3 text-success"></i>
+                                <h5 class="fw-bold m-0">¡Campaña Activa!</h5>
+                                <small class="text-muted mt-1 d-block">Destacado en el catálogo</small>
+                            </div>
+                            {% else %}
+                            <div class="bg-light rounded-4 p-4 border shadow-sm">
+                                <i class="fas fa-award fa-4x mb-3 text-muted opacity-50"></i>
+                                <h5 class="fw-bold text-muted m-0">Sin Campaña Activa</h5>
+                                <small class="text-muted mt-1 d-block">Tu local se muestra en orden estándar</small>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. SECCIÓN: PROMOCIONES -->
+            <div id="seccion-promociones" class="seccion-panel">
+                <div class="py-card">
+                    <h4 class="fw-bold mb-2 text-dark"><i class="fas fa-tag text-danger me-2"></i>Promociones del Local
+                    </h4>
+                    <p class="text-muted small mb-4">Aplica un porcentaje de descuento a cualquiera de tus platillos del
+                        menú.</p>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle border-top">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Imagen</th>
+                                    <th>Nombre del Platillo</th>
+                                    <th>Precio Estándar</th>
+                                    <th>Descuento / Oferta</th>
+                                    <th class="text-end">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for prod in productos_negocio %}
+                                <tr>
+                                    <td>
+                                        <img src="{{ prod.imagen_url }}" class="rounded shadow-sm"
+                                            style="width: 50px; height: 50px; object-fit: cover;">
+                                    </td>
+                                    <td class="fw-bold">{{ prod.nombre }}</td>
+                                    <td>S/ {{ prod.precio }}</td>
+                                    <td>
+                                        {% if prod.descuento_porcentaje %}
+                                        <span class="text-danger fw-bold"><i class="fas fa-arrow-down me-1"></i>{{
+                                            prod.descuento_porcentaje }}% Desct.</span>
+                                        <br>
+                                        <small class="text-muted">Oferta: S/ {{ prod.precio_oferta }}</small>
+                                        {% else %}
+                                        <span class="text-muted small">Sin descuento</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">
+                                        <form action="{% url 'pedidos:actualizar_promocion' %}" method="POST"
+                                            class="d-flex justify-content-end align-items-center gap-2">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="producto_id" value="{{ prod.id }}">
+                                            <input type="number" name="descuento_porcentaje" min="1" max="99"
+                                                class="form-control form-control-sm" style="width: 90px;"
+                                                placeholder="Ej. 10%"
+                                                value="{{ prod.descuento_porcentaje|default:'' }}">
+                                            <button type="submit" class="btn btn-sm btn-danger rounded-3 fw-bold">
+                                                Fijar %
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-4 text-muted">Agrega productos al menú para
+                                        fijar ofertas.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 7. SECCIÓN: HORARIOS -->
+            <div id="seccion-horarios" class="seccion-panel">
+                <div class="py-card">
+                    <h4 class="fw-bold mb-3 text-dark"><i class="far fa-clock text-danger me-2"></i>Horarios y Estado de
+                        Atención</h4>
+                    <p class="text-muted">Controla si tu local está abierto a pedidos y establece los horarios de
+                        apertura y cierre.</p>
+
+                    <hr class="my-4">
+
+                    <form action="{% url 'pedidos:actualizar_horarios' %}" method="POST" style="max-width: 500px;">
+                        {% csrf_token %}
+
+                        <!-- Toggle de estado -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-dark">Estado de Local</label>
+                            <div class="form-check form-switch py-1 fs-5">
+                                <input class="form-check-input" type="checkbox" role="switch" id="switchAbierto" {% if
+                                    negocio.abierto %}checked{% endif %}>
+                                <input type="hidden" name="abierto" id="hiddenAbierto"
+                                    value="{% if negocio.abierto %}true{% else %}false{% endif %}">
+                                <label class="form-check-label text-dark fw-bold ms-2" for="switchAbierto"
+                                    id="labelEstadoLocal">
+                                    {% if negocio.abierto %}🟢 Abierto (Recibe pedidos){% else %}🔴 Cerrado (Sin
+                                    pedidos){% endif %}
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Inputs de Hora -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-6">
+                                <label class="form-label fw-bold small text-muted text-uppercase">Hora de
+                                    Apertura</label>
+                                <input type="time" name="hora_apertura" class="form-control"
+                                    value="{{ negocio.hora_apertura|time:'H:i' }}">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label fw-bold small text-muted text-uppercase">Hora de Cierre</label>
+                                <input type="time" name="hora_cierre" class="form-control"
+                                    value="{{ negocio.hora_cierre|time:'H:i' }}">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-danger rounded-pill fw-bold px-4 btn-lg shadow-sm">
+                            Guardar Configuración
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    // Script para expandir el contenedor principal
+    document.addEventListener("DOMContentLoaded", function () {
+        const mainContainer = document.querySelector('main.container');
+        if (mainContainer) {
+            mainContainer.classList.remove('container');
+            mainContainer.classList.add('container-fluid', 'px-0');
+        }
+
+        // Listener para actualizar el switch de local abierto/cerrado
+        const switchAbierto = document.getElementById("switchAbierto");
+        const hiddenAbierto = document.getElementById("hiddenAbierto");
+        const labelEstado = document.getElementById("labelEstadoLocal");
+        if (switchAbierto) {
+            switchAbierto.addEventListener("change", function () {
+                if (this.checked) {
+                    hiddenAbierto.value = "true";
+                    labelEstado.innerText = "🟢 Abierto (Recibe pedidos)";
+                } else {
+                    hiddenAbierto.value = "false";
+                    labelEstado.innerText = "🔴 Cerrado (Sin pedidos)";
+                }
+            });
+        }
+    });
+
+    // SCRIPT DE NAVEGACIÓN DE PESTAÑAS (TABS)
+    function cambiarPestana(idSeccion, elemento) {
+        // 1. Ocultar todas las secciones
+        const secciones = document.querySelectorAll('.seccion-panel');
+        secciones.forEach(sec => sec.classList.remove('activa'));
+
+        // 2. Quitar el color "activo" de todos los links del menú lateral
+        const links = document.querySelectorAll('.sidebar-link');
+        links.forEach(link => link.classList.remove('active'));
+
+        // 3. Mostrar la sección deseada
+        document.getElementById('seccion-' + idSeccion).classList.add('activa');
+
+        // 4. Marcar el link como activo
+        elemento.classList.add('active');
+
+        // 5. Cambiar el título de la cabecera
+        const titulos = {
+            'procesamiento': 'Procesamiento de Pedidos',
+            'tablero': 'Tablero de Control',
+            'reportes': 'Reportes de Ventas',
+            'evaluaciones': 'Evaluación y Opiniones',
+            'publicidad': 'Publicidad en la App',
+            'promociones': 'Promociones y Descuentos',
+            'horarios': 'Horarios y Estado de Local'
+        };
+        const titulo = document.getElementById('titulo-cabecera');
+        titulo.innerText = titulos[idSeccion] || (idSeccion.charAt(0).toUpperCase() + idSeccion.slice(1));
+    }
+</script>
+{% endblock %}
