@@ -4,86 +4,206 @@
 
 {% block extra_js %}
 <style>
-    body { background-color: #f8f9fa; }
-    
-    .page-header {
-        background: #fff; padding: 30px 0; border-bottom: 1px solid #e5e7eb; margin-bottom: 30px;
+    body {
+        background-color: #f8f9fa;
     }
-    
+
+    .page-header {
+        background: #fff;
+        padding: 30px 0;
+        border-bottom: 1px solid #e5e7eb;
+        margin-bottom: 30px;
+    }
+
     /* Estilos de la Tarjeta del Pedido */
     .order-card {
-        background: #fff; border-radius: 16px; border: 1px solid #e5e7eb;
-        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow: hidden;
-        margin-bottom: 25px; transition: transform 0.2s;
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        margin-bottom: 25px;
+        transition: transform 0.2s;
     }
-    .order-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
-    
+
+    .order-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
     .order-header {
-        padding: 20px 25px; border-bottom: 1px solid #f3f4f6;
-        display: flex; justify-content: space-between; align-items: center;
+        padding: 20px 25px;
+        border-bottom: 1px solid #f3f4f6;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
-    
+
     .negocio-logo {
-        width: 50px; height: 50px; border-radius: 12px; background: #f3f4f6;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 1.5rem; color: #9ca3af; margin-right: 15px;
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        background: #f3f4f6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: #9ca3af;
+        margin-right: 15px;
     }
-    
+
     /* Línea de Tiempo Visual (Timeline de Rastreo) */
-    .tracking-container { padding: 25px 30px; background-color: #fafafa; border-bottom: 1px solid #f3f4f6; }
-    
+    .tracking-container {
+        padding: 25px 30px;
+        background-color: #fafafa;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
     .track-steps {
-        display: flex; justify-content: space-between; position: relative; margin-bottom: 15px;
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        margin-bottom: 15px;
     }
+
     .track-steps::before {
-        content: ''; position: absolute; top: 15px; left: 0; right: 0; height: 3px; background: #e5e7eb; z-index: 1;
+        content: '';
+        position: absolute;
+        top: 15px;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: #e5e7eb;
+        z-index: 1;
     }
-    
+
     .step {
-        position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; text-align: center; width: 25%;
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        width: 25%;
     }
+
     .step-icon {
-        width: 32px; height: 32px; border-radius: 50%; background: #fff; border: 3px solid #e5e7eb;
-        display: flex; align-items: center; justify-content: center; color: #9ca3af; font-size: 0.85rem;
-        margin-bottom: 8px; transition: all 0.3s;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #fff;
+        border: 3px solid #e5e7eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #9ca3af;
+        font-size: 0.85rem;
+        margin-bottom: 8px;
+        transition: all 0.3s;
     }
-    .step-label { font-size: 0.75rem; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; }
-    
+
+    .step-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
     /* Estado Activo en la línea de tiempo */
-    .step.active .step-icon { border-color: #e11d48; background: #e11d48; color: #fff; box-shadow: 0 0 0 4px rgba(225, 29, 72, 0.15); }
-    .step.active .step-label { color: #e11d48; }
-    .step.active ~ .step::before { display: none; } /* Ocultar línea activa en los siguientes */
-    
+    .step.active .step-icon {
+        border-color: #e11d48;
+        background: #e11d48;
+        color: #fff;
+        box-shadow: 0 0 0 4px rgba(225, 29, 72, 0.15);
+    }
+
+    .step.active .step-label {
+        color: #e11d48;
+    }
+
+    .step.active~.step::before {
+        display: none;
+    }
+
+    /* Ocultar línea activa en los siguientes */
+
     /* Línea roja conectora */
     .step.active::after {
-        content: ''; position: absolute; top: 15px; left: -100%; width: 100%; height: 3px; background: #e11d48; z-index: -1;
+        content: '';
+        position: absolute;
+        top: 15px;
+        left: -100%;
+        width: 100%;
+        height: 3px;
+        background: #e11d48;
+        z-index: -1;
     }
-    .step:first-child::after { display: none; }
+
+    .step:first-child::after {
+        display: none;
+    }
 
     /* Estado Cancelado */
     .cancelled-state {
-        padding: 20px; background: #fef2f2; border-radius: 12px; border: 1px solid #fecaca;
-        display: flex; align-items: center; gap: 15px; color: #991b1b;
+        padding: 20px;
+        background: #fef2f2;
+        border-radius: 12px;
+        border: 1px solid #fecaca;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        color: #991b1b;
     }
 
-    .order-details { padding: 20px 25px; }
+    .order-details {
+        padding: 20px 25px;
+    }
+
     .item-pill {
-        background: #f3f4f6; color: #374151; font-size: 0.85rem; font-weight: 600;
-        padding: 6px 12px; border-radius: 20px; display: inline-block; margin: 4px 4px 4px 0;
+        background: #f3f4f6;
+        color: #374151;
+        font-size: 0.85rem;
+        font-weight: 600;
+        padding: 6px 12px;
+        border-radius: 20px;
+        display: inline-block;
+        margin: 4px 4px 4px 0;
     }
-    
+
     .order-footer {
-        padding: 15px 25px; background: #fff; border-top: 1px solid #f3f4f6;
-        display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+        padding: 15px 25px;
+        background: #fff;
+        border-top: 1px solid #f3f4f6;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
     }
+
     .pulse-dot {
-        width: 8px; height: 8px; border-radius: 50%; background: #10b981;
-        display: inline-block; margin-right: 6px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #10b981;
+        display: inline-block;
+        margin-right: 6px;
         animation: pulse 1.5s infinite;
     }
+
     @keyframes pulse {
-        0%, 100% { opacity: 1; transform: scale(1); }
-        50% { opacity: 0.4; transform: scale(1.3); }
+
+        0%,
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: 0.4;
+            transform: scale(1.3);
+        }
     }
 </style>
 {% endblock %}
@@ -100,21 +220,23 @@
 
     {% for pedido in pedidos %}
     <div class="order-card">
-        
+
         <div class="order-header">
             <div class="d-flex align-items-center">
                 <div class="negocio-logo" style="overflow:hidden; flex-shrink:0;">
                     {% if pedido.sede.negocio.logo %}
-                        <img src="{{ pedido.sede.negocio.logo.url }}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;" alt="logo">
+                    <img src="{{ pedido.sede.negocio.logo.url }}"
+                        style="width:100%;height:100%;object-fit:cover;border-radius:12px;" alt="logo">
                     {% else %}
-                        <i class="fas fa-store"></i>
+                    <i class="fas fa-store"></i>
                     {% endif %}
                 </div>
                 <div>
-                    <h5 class="fw-bold m-0 text-dark">{{ pedido.sede.negocio.nombre_comercial|default:"Negocio Local" }}</h5>
+                    <h5 class="fw-bold m-0 text-dark">{{ pedido.sede.negocio.nombre_comercial|default:"Negocio Local" }}
+                    </h5>
                     <div class="text-muted small mt-1">
                         <i class="far fa-calendar-alt me-1"></i> {{ pedido.fecha_creacion|date:"d M Y - H:i" }}
-                        <span class="mx-2">•</span> 
+                        <span class="mx-2">•</span>
                         <span class="fw-bold">Orden #{{ pedido.id }}</span>
                     </div>
                 </div>
@@ -127,49 +249,49 @@
 
         <div class="tracking-container">
             {% if pedido.estado == 'CN' %}
-                <div class="cancelled-state">
-                    <i class="fas fa-times-circle fa-2x"></i>
-                    <div>
-                        <h6 class="fw-bold m-0">Pedido Cancelado</h6>
-                        <span class="small">Lamentamos los inconvenientes. Este pedido no fue procesado.</span>
-                    </div>
+            <div class="cancelled-state">
+                <i class="fas fa-times-circle fa-2x"></i>
+                <div>
+                    <h6 class="fw-bold m-0">Pedido Cancelado</h6>
+                    <span class="small">Lamentamos los inconvenientes. Este pedido no fue procesado.</span>
                 </div>
+            </div>
             {% else %}
-                <div class="track-steps">
-                    <div class="step active">
-                        <div class="step-icon"><i class="fas fa-file-invoice"></i></div>
-                        <div class="step-label">Aprobado</div>
-                    </div>
-                    
-                    <div class="step {% if pedido.estado in 'PR,LI,CA,EN' %}active{% endif %}">
-                        <div class="step-icon"><i class="fas fa-fire-burner"></i></div>
-                        <div class="step-label">Preparando</div>
-                    </div>
-                    
-                    <div class="step {% if pedido.estado in 'CA,EN' %}active{% endif %}">
-                        <div class="step-icon"><i class="fas fa-motorcycle"></i></div>
-                        <div class="step-label">En Camino</div>
-                    </div>
-                    
-                    <div class="step {% if pedido.estado == 'EN' %}active{% endif %}">
-                        <div class="step-icon"><i class="fas fa-check"></i></div>
-                        <div class="step-label">Entregado</div>
-                    </div>
+            <div class="track-steps">
+                <div class="step active">
+                    <div class="step-icon"><i class="fas fa-file-invoice"></i></div>
+                    <div class="step-label">Aprobado</div>
                 </div>
-                
-                <div class="text-center mt-3">
-                    <span class="badge bg-light text-dark border px-3 py-2 rounded-pill fw-bold shadow-sm">
-                        {% if pedido.estado == 'RE' or pedido.estado == 'CO' %}
-                            <i class="fas fa-clock text-warning me-1"></i> El local está revisando tu orden.
-                        {% elif pedido.estado == 'PR' or pedido.estado == 'LI' %}
-                            <i class="fas fa-fire-burner text-danger me-1"></i> Tu comida se está preparando con cuidado.
-                        {% elif pedido.estado == 'CA' %}
-                            <i class="fas fa-motorcycle text-primary me-1"></i> ¡Tu repartidor ya está en camino!
-                        {% elif pedido.estado == 'EN' %}
-                            <i class="fas fa-star text-warning me-1"></i> Pedido completado. ¡Esperamos lo hayas disfrutado!
-                        {% endif %}
-                    </span>
+
+                <div class="step {% if pedido.estado in 'PR,LI,CA,EN' %}active{% endif %}">
+                    <div class="step-icon"><i class="fas fa-fire-burner"></i></div>
+                    <div class="step-label">Preparando</div>
                 </div>
+
+                <div class="step {% if pedido.estado in 'CA,EN' %}active{% endif %}">
+                    <div class="step-icon"><i class="fas fa-motorcycle"></i></div>
+                    <div class="step-label">En Camino</div>
+                </div>
+
+                <div class="step {% if pedido.estado == 'EN' %}active{% endif %}">
+                    <div class="step-icon"><i class="fas fa-check"></i></div>
+                    <div class="step-label">Entregado</div>
+                </div>
+            </div>
+
+            <div class="text-center mt-3">
+                <span class="badge bg-light text-dark border px-3 py-2 rounded-pill fw-bold shadow-sm">
+                    {% if pedido.estado == 'RE' or pedido.estado == 'CO' %}
+                    <i class="fas fa-clock text-warning me-1"></i> El local está revisando tu orden.
+                    {% elif pedido.estado == 'PR' or pedido.estado == 'LI' %}
+                    <i class="fas fa-fire-burner text-danger me-1"></i> Tu comida se está preparando con cuidado.
+                    {% elif pedido.estado == 'CA' %}
+                    <i class="fas fa-motorcycle text-primary me-1"></i> ¡Tu repartidor ya está en camino!
+                    {% elif pedido.estado == 'EN' %}
+                    <i class="fas fa-star text-warning me-1"></i> Pedido completado. ¡Esperamos lo hayas disfrutado!
+                    {% endif %}
+                </span>
+            </div>
             {% endif %}
         </div>
 
@@ -177,37 +299,41 @@
             <h6 class="fw-bold text-dark mb-3 small text-uppercase">Resumen del Pedido:</h6>
             <div>
                 {% for item in pedido.items_pedido.all %}
-                    <span class="item-pill">
-                        <span class="text-danger fw-bold me-1">{{ item.cantidad }}x</span> {{ item.producto.nombre|truncatechars:25 }}
-                    </span>
+                <span class="item-pill">
+                    <span class="text-danger fw-bold me-1">{{ item.cantidad }}x</span> {{
+                    item.producto.nombre|truncatechars:25 }}
+                </span>
                 {% endfor %}
             </div>
         </div>
 
         <div class="order-footer">
-            <a href="{% url 'detalle_sede' pedido.sede.id %}" class="btn btn-outline-dark rounded-pill px-4 fw-bold shadow-sm">
+            <a href="{% url 'detalle_sede' pedido.sede.id %}"
+                class="btn btn-outline-dark rounded-pill px-4 fw-bold shadow-sm">
                 <i class="fas fa-store me-1"></i> Visitar Local
             </a>
             <div class="d-flex gap-2 flex-wrap">
-            {% if pedido.estado == 'EN' %}
-                <a href="{% url 'detalle_sede' pedido.sede.id %}" class="btn btn-danger rounded-pill px-4 fw-bold shadow-sm">
+                {% if pedido.estado == 'EN' %}
+                <a href="{% url 'detalle_sede' pedido.sede.id %}"
+                    class="btn btn-danger rounded-pill px-4 fw-bold shadow-sm">
                     <i class="fas fa-redo-alt me-1"></i> Volver a Pedir
                 </a>
-            {% elif pedido.estado == 'RE' or pedido.estado == 'CO' %}
+                {% elif pedido.estado == 'RE' or pedido.estado == 'CO' %}
                 <span class="text-muted small fw-semibold d-flex align-items-center">
                     <span class="pulse-dot"></span> Pedido activo
                 </span>
-                <form action="{% url 'pedidos:cancelar_pedido' pedido.id %}" method="POST" onsubmit="return confirm('\u00bfEst\u00e1s seguro que deseas cancelar este pedido?')">
+                <form action="{% url 'pedidos:cancelar_pedido' pedido.id %}" method="POST"
+                    onsubmit="return confirm('\u00bfEst\u00e1s seguro que deseas cancelar este pedido?')">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-outline-danger rounded-pill px-4 fw-bold">
                         <i class="fas fa-times me-1"></i> Cancelar Pedido
                     </button>
                 </form>
-            {% else %}
+                {% else %}
                 <button class="btn btn-light rounded-pill px-4 fw-bold text-muted border" disabled>
                     En proceso...
                 </button>
-            {% endif %}
+                {% endif %}
             </div>
         </div>
 
@@ -219,7 +345,8 @@
                 <div class="d-flex align-items-center justify-content-between mb-2">
                     <span class="fw-bold small text-muted text-uppercase">¿Qué tal estuvo tu pedido?</span>
                     <div class="d-flex gap-1 align-items-center">
-                        <select name="puntuacion" class="form-select form-select-sm fw-bold text-dark border-0 bg-white" style="width: 120px;">
+                        <select name="puntuacion" class="form-select form-select-sm fw-bold text-dark border-0 bg-white"
+                            style="width: 120px;">
                             <option value="5" selected>⭐⭐⭐⭐⭐</option>
                             <option value="4">⭐⭐⭐⭐</option>
                             <option value="3">⭐⭐⭐</option>
@@ -229,7 +356,8 @@
                     </div>
                 </div>
                 <div class="d-flex gap-2">
-                    <input type="text" name="comentario" class="form-control form-control-sm border-0 shadow-sm" placeholder="Escribe un comentario breve sobre tu comida..." required>
+                    <input type="text" name="comentario" class="form-control form-control-sm border-0 shadow-sm"
+                        placeholder="Escribe un comentario breve sobre tu comida..." required>
                     <button type="submit" class="btn btn-danger btn-sm rounded-pill px-3 fw-bold">
                         Valorar
                     </button>
@@ -257,7 +385,8 @@
         <ul class="pagination justify-content-center border-0">
             {% if page_obj.has_previous %}
             <li class="page-item">
-                <a class="page-link rounded-pill px-3 mx-1 text-dark border-0 shadow-sm" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                <a class="page-link rounded-pill px-3 mx-1 text-dark border-0 shadow-sm"
+                    href="?page={{ page_obj.previous_page_number }}">Anterior</a>
             </li>
             {% endif %}
 
@@ -269,7 +398,8 @@
 
             {% if page_obj.has_next %}
             <li class="page-item">
-                <a class="page-link rounded-pill px-3 mx-1 text-dark border-0 shadow-sm" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+                <a class="page-link rounded-pill px-3 mx-1 text-dark border-0 shadow-sm"
+                    href="?page={{ page_obj.next_page_number }}">Siguiente</a>
             </li>
             {% endif %}
         </ul>
@@ -283,7 +413,7 @@
     const activeStates = ['RE', 'CO', 'PR', 'LI', 'CA'];
     const pedidosData = [
         {% for pedido in pedidos %}
-            '{{ pedido.estado }}',
+    '{{ pedido.estado }}',
         {% endfor %}
     ];
     const hayPedidosActivos = pedidosData.some(estado => activeStates.includes(estado));

@@ -515,27 +515,26 @@
                                     {% csrf_token %}
                                     {% if pedido.estado == 'EN' or pedido.estado == 'CN' %}
                                     <select disabled class="form-select bg-light border-0 fw-bold text-dark opacity-75">
-                                        <option>{% if pedido.estado == 'EN' %}🏁 Entregado{% else %}❌ Cancelado{% endif
-                                            %}</option>
+                                        <option>{% if pedido.estado == 'EN' %}🏁 Entregado{% else %}❌ Cancelado{% endif %}</option>
                                     </select>
                                     {% else %}
                                     <select name="estado" class="form-select bg-light border-0 fw-bold text-dark">
-                                        <option value="RE" {% if pedido.estado=='RE' %}selected{% endif %}>🟢 Recibido
+                                        <option value="RE" {% if pedido.estado == 'RE' %}selected{% endif %}>🟢 Recibido
                                         </option>
-                                        <option value="CO" {% if pedido.estado=='CO' %}selected{% endif %}>🔵 Confirmado
+                                        <option value="CO" {% if pedido.estado == 'CO' %}selected{% endif %}>🔵 Confirmado
                                         </option>
-                                        <option value="PR" {% if pedido.estado=='PR' %}selected{% endif %}>🟣
+                                        <option value="PR" {% if pedido.estado == 'PR' %}selected{% endif %}>🟣
                                             Preparación
                                         </option>
-                                        <option value="LI" {% if pedido.estado=='LI' %}selected{% endif %}>✅ Listo
+                                        <option value="LI" {% if pedido.estado == 'LI' %}selected{% endif %}>✅ Listo
                                             (Recojo)
                                         </option>
                                         <option disabled>──────</option>
-                                        <option value="CA" {% if pedido.estado=='CA' %}selected{% endif %}>🛵 En camino
+                                        <option value="CA" {% if pedido.estado == 'CA' %}selected{% endif %}>🛵 En camino
                                         </option>
-                                        <option value="EN" {% if pedido.estado=='EN' %}selected{% endif %}>🏁 Entregado
+                                        <option value="EN" {% if pedido.estado == 'EN' %}selected{% endif %}>🏁 Entregado
                                         </option>
-                                        <option value="CN" {% if pedido.estado=='CN' %}selected{% endif %}>❌ Cancelar
+                                        <option value="CN" {% if pedido.estado == 'CN' %}selected{% endif %}>❌ Cancelar
                                         </option>
                                     </select>
                                     <button type="submit" class="btn btn-danger rounded-3 px-3 shadow-sm">
@@ -939,14 +938,12 @@
                         <div class="mb-4">
                             <label class="form-label fw-bold text-dark">Estado de Local</label>
                             <div class="form-check form-switch py-1 fs-5">
-                                <input class="form-check-input" type="checkbox" role="switch" id="switchAbierto" {% if
-                                    negocio.abierto %}checked{% endif %}>
+                                <input class="form-check-input" type="checkbox" role="switch" id="switchAbierto" {% if negocio.abierto %}checked{% endif %}>
                                 <input type="hidden" name="abierto" id="hiddenAbierto"
                                     value="{% if negocio.abierto %}true{% else %}false{% endif %}">
                                 <label class="form-check-label text-dark fw-bold ms-2" for="switchAbierto"
                                     id="labelEstadoLocal">
-                                    {% if negocio.abierto %}🟢 Abierto (Recibe pedidos){% else %}🔴 Cerrado (Sin
-                                    pedidos){% endif %}
+                                    {% if negocio.abierto %}🟢 Abierto (Recibe pedidos){% else %}🔴 Cerrado (Sin pedidos){% endif %}
                                 </label>
                             </div>
                         </div>
